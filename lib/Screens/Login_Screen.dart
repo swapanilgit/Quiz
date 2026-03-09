@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'SignUpScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -234,8 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 40*3),
-
+                  const SizedBox(height: 40 * 3),
                 ],
               ),
             ),
@@ -243,7 +243,27 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       persistentFooterButtons: [
-        
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "Don't have an account?",
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreateAccountScreen()),
+                );
+              },
+              child: const Text(
+                "Sign Up",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

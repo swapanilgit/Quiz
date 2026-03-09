@@ -1,0 +1,258 @@
+// ignore_for_file: file_names
+
+import 'package:flutter/material.dart';
+import 'package:quiz/Screens/QuizScreen.dart';
+import 'package:quiz/Screens/buildCategoryCard.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  final List<String> bottomLabels = ["Home","Rankings", "Profile"];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("${bottomLabels[index]} Clicked"),
+        duration: const Duration(milliseconds: 500),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+
+              /// Top Welcome Text
+              const Text(
+                "Welcome back, Alex!",
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+              ),
+
+              const SizedBox(height: 8),
+
+              const Text(
+                "Explore Quizzes",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// Search Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E293B),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const TextField(
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.search, color: Colors.white54),
+                    hintText: "Search topics, quizzes or users...",
+                    hintStyle: TextStyle(color: Colors.white54),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              /// Featured Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Featured Challenges",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("See All Clicked")),
+                      );
+                    },
+                    child: const Text("See All"),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 15),
+
+              /// Featured Card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1E3A8A), Color(0xFF0F172A)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Chip(
+                      label: Text("WEEKLY SPECIAL"),
+                      backgroundColor: Colors.blue,
+                      labelStyle: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Cosmic Wonders",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "Test your space knowledge",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              /// Categories Header
+              const Text(
+                "Categories",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// Categories Grid
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 15,
+                mainAxisSpacing: 15,
+                childAspectRatio: 1.1,
+                children: [
+                  buildCategoryCard(
+                    icon: Icons.science,
+                    title: "Science",
+                    
+                    color: Colors.blue,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const QuizScreen('Science'),
+                        ),
+                      );
+                    },
+                    quizCount: '',
+                  ),
+
+                  buildCategoryCard(
+                    icon: Icons.history_edu,
+                    title: "History",
+                    color: Colors.orange,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const QuizScreen("History"),
+                        ),
+                      );
+                    },
+                    quizCount: '',
+                  ),
+
+                  buildCategoryCard(
+                    icon: Icons.memory,
+                    title: "Technology",
+                    color: Colors.purple,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const QuizScreen("Technology"),
+                        ),
+                      );
+                    },
+                    quizCount: '',
+                  ),
+
+                  buildCategoryCard(
+                    icon: Icons.palette,
+                    title: "Art & Design",
+                    color: Colors.red,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const QuizScreen("Art & Design"),
+                        ),
+                      );
+                    },
+                    quizCount: '',
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+
+      /// Bottom Navigation
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF0F172A),
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.white54,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          // BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Discover"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: "Rankings",
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
+      ),
+    );
+  }
+}
