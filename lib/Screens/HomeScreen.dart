@@ -184,13 +184,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   buildCategoryCard(
                     icon: Icons.history_edu,
-                    title: "History",
+                    title: "Indian History",
                     color: Colors.orange,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const QuizScreen("History"),
+                          builder: (_) => const QuizScreen("Indian History"),
                         ),
                       );
                     },
@@ -244,13 +244,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   buildCategoryCard(
                     icon: Icons.memory,
-                    title: "Technology",
+                    title: "Computer",
                     color: Colors.purple,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Technology"),
+                          builder: (_) => const QuizScreen("Computer"),
                         ),
                       );
                     },
@@ -259,13 +259,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   buildCategoryCard(
                     icon: Icons.palette,
-                    title: "Art & Design",
+                    title: "Art & Drawing",
                     color: Colors.red,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Art & Design"),
+                          builder: (_) => const QuizScreen("Art & Drawing"),
                         ),
                       );
                     },

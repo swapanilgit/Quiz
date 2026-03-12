@@ -40,55 +40,161 @@ class _QuizScreenState extends State<QuizScreen> {
       Question(
         title: "Science",
         question: "Which planet is known as the Red Planet?",
-        options: ["Mars", "Venus", "Jupiter", "Saturn"],
+        options: ["Earth", "Mars", "Jupiter", "Venus"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Science",
+        question: "What gas do humans need to breathe to survive?",
+        options: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Science",
+        question: "Which part of the plant makes food?",
+        options: ["Root", "Stem", "Leaf", "Flower"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Science",
+        question: "What is the center of our solar system?",
+        options: ["Earth", "Moon", "Sun", "Mars"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Science",
+        question: "Which organ pumps blood in the human body?",
+        options: ["Brain", "Heart", "Lungs", "Kidney"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Science",
+        question: "What force pulls objects toward the Earth?",
+        options: ["Magnetism", "Gravity", "Friction", "Energy"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Science",
+        question: "What is the boiling point of water?",
+        options: ["50°C", "75°C", "100°C", "150°C"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Science",
+        question: "Which animal is known as the largest mammal?",
+        options: ["Elephant", "Blue Whale", "Shark", "Giraffe"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Science",
+        question: "Which gas do plants release during photosynthesis?",
+        options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
         correctIndex: 0,
       ),
       Question(
         title: "Science",
-        question: "Which planet is the biggest in our solar system?",
-        options: ["Earth", "Mars", "Jupiter", "Saturn"],
-        correctIndex: 2,
+        question: "How many bones are there in an adult human body?",
+        options: ["206", "150", "300", "180"],
+        correctIndex: 0,
       ),
     ],
 
-    "History": [
+    "Indian History": [
       Question(
-        title: "History",
+        title: "Indian History",
+        question: "Who was the first Prime Minister of India?",
+        options: [
+          "Mahatma Gandhi",
+          "Jawaharlal Nehru",
+          "Sardar Patel",
+          "Rajendra Prasad",
+        ],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Indian History",
+        question: "In which year did India gain independence?",
+        options: ["1945", "1946", "1947", "1950"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Indian History",
+        question: "Who was known as the Father of the Nation in India?",
+        options: [
+          "Subhas Chandra Bose",
+          "Jawaharlal Nehru",
+          "Mahatma Gandhi",
+          "Bhagat Singh",
+        ],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Indian History",
+        question: "Who founded the Maurya Empire?",
+        options: ["Ashoka", "Chandragupta Maurya", "Harsha", "Akbar"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Indian History",
+        question: "Which Mughal emperor built the Taj Mahal?",
+        options: ["Akbar", "Babur", "Shah Jahan", "Aurangzeb"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Indian History",
+        question: "Who was the last Mughal emperor of India?",
+        options: ["Bahadur Shah Zafar", "Aurangzeb", "Akbar", "Humayun"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Indian History",
+        question: "Which movement was started by Mahatma Gandhi in 1942?",
+        options: [
+          "Non-Cooperation Movement",
+          "Quit India Movement",
+          "Civil Disobedience Movement",
+          "Swadeshi Movement",
+        ],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Indian History",
         question: "Who was the first President of India?",
         options: [
           "Dr. Rajendra Prasad",
           "Jawaharlal Nehru",
-          "Mahatma Gandhi",
           "Sardar Patel",
+          "Dr. B. R. Ambedkar",
         ],
         correctIndex: 0,
       ),
       Question(
-        title: "History",
-        question: "In which year did India get Independence?",
-        options: ["1945", "1946", "1947", "1950"],
-        correctIndex: 2,
+        title: "Indian History",
+        question: "Who was known as the Iron Man of India?",
+        options: [
+          "Jawaharlal Nehru",
+          "Sardar Vallabhbhai Patel",
+          "Subhas Chandra Bose",
+          "Bhagat Singh",
+        ],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Indian History",
+        question: "Who wrote the Indian National Anthem?",
+        options: [
+          "Rabindranath Tagore",
+          "Bankim Chandra Chatterjee",
+          "Sarojini Naidu",
+          "Subhas Chandra Bose",
+        ],
+        correctIndex: 0,
       ),
     ],
 
-    "Sports": [
+    "Computer": [
       Question(
-        title: "Sports",
-        question: "Which country won the FIFA World Cup in 2018?",
-        options: ["Brazil", "Germany", "France", "Argentina"],
-        correctIndex: 2,
-      ),
-      Question(
-        title: "Sports",
-        question: "How many players are there in a cricket team?",
-        options: ["9", "10", "11", "12"],
-        correctIndex: 2,
-      ),
-    ],
-
-    "Technology": [
-      Question(
-        title: "Technology",
+        title: "Computer",
         question: "What does CPU stand for?",
         options: [
           "Central Processing Unit",
@@ -99,10 +205,144 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 0,
       ),
       Question(
-        title: "Technology",
-        question: "Which language is used to build Flutter apps?",
-        options: ["Java", "Dart", "Python", "C++"],
+        title: "Computer",
+        question: "Which of the following is an input device?",
+        options: ["Monitor", "Keyboard", "Printer", "Speaker"],
         correctIndex: 1,
+      ),
+
+      Question(
+        title: "Computer",
+        question: "What does RAM stand for?",
+        options: [
+          "Random Access Memory",
+          "Read Access Memory",
+          "Run Access Memory",
+          "Random Active Memory",
+        ],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Computer",
+        question: "What does RAM stand for?",
+        options: [
+          "Random Access Memory",
+          "Read Access Memory",
+          "Run Access Memory",
+          "Rapid Action Memory",
+        ],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Computer",
+        question: "Which storage device is used to store data permanently?",
+        options: ["RAM", "Cache", "Hard Disk", "Register"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Computer",
+        question: "Which device is used to control the pointer on the screen?",
+        options: ["Mouse", "Printer", "Speaker", "Scanner"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Computer",
+        question: "Which software is used to browse the internet?",
+        options: ["Browser", "Compiler", "Operating System", "Text Editor"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Computer",
+        question: "Which key is used to move to the next line while typing?",
+        options: ["Shift", "Enter", "Tab", "Ctrl"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Computer",
+        question: "Which unit is used to measure computer memory?",
+        options: ["Meter", "Byte", "Second", "Volt"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Computer",
+        question:
+            "Which of the following is an example of an operating system?",
+        options: [
+          "Microsoft Word",
+          "Google Chrome",
+          "Windows 10",
+          "Adobe Photoshop",
+        ],
+        correctIndex: 2,
+      ),
+    ],
+
+    "Sports": [
+      Question(
+        title: "Sports",
+        question:
+            "How many players are there in a football (soccer) team on the field?",
+        options: ["9", "10", "11", "12"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Sports",
+        question: "Which country won the Cricket World Cup in 2011?",
+        options: ["Australia", "India", "England", "Pakistan"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Sports",
+        question: "Which sport uses a racket and shuttlecock?",
+        options: ["Tennis", "Badminton", "Table Tennis", "Squash"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Sports",
+        question: "How many players are there in a cricket team?",
+        options: ["9", "10", "11", "12"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Sports",
+        question: "Which sport is associated with Wimbledon?",
+        options: ["Cricket", "Football", "Tennis", "Hockey"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Sports",
+        question: "Which country hosted the 2016 Summer Olympics?",
+        options: ["China", "Brazil", "Japan", "UK"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Sports",
+        question: "In which sport is the term 'checkmate' used?",
+        options: ["Chess", "Tennis", "Football", "Hockey"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Sports",
+        question: "Which Indian player is known as the 'God of Cricket'?",
+        options: [
+          "Virat Kohli",
+          "MS Dhoni",
+          "Sachin Tendulkar",
+          "Rohit Sharma",
+        ],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Sports",
+        question: "How many rings are there in the Olympic symbol?",
+        options: ["4", "5", "6", "7"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Sports",
+        question: "Which sport uses a hoop and a ball?",
+        options: ["Basketball", "Volleyball", "Tennis", "Baseball"],
+        correctIndex: 0,
       ),
     ],
 
@@ -195,10 +435,10 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
     ],
 
-    "Art & Design": [
+    "Arts & Drawing": [
       Question(
-        title: "Art & Design",
-        question: "Who painted the Mona Lisa?",
+        title: "Arts & Drawing",
+        question: "Who painted the famous artwork 'Mona Lisa'?",
         options: [
           "Vincent Van Gogh",
           "Leonardo da Vinci",
@@ -208,12 +448,77 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 1,
       ),
       Question(
-        title: "Art & Design",
-        question: "Which color is created by mixing red and blue?",
-        options: ["Green", "Purple", "Orange", "Brown"],
+        title: "Arts & Drawing",
+        question: "Which colors are known as primary colors?",
+        options: [
+          "Red, Blue, Yellow",
+          "Green, Orange, Purple",
+          "Black, White, Grey",
+          "Pink, Brown, Blue",
+        ],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Arts & Drawing",
+        question: "Which tool is commonly used for sketching?",
+        options: ["Brush", "Pencil", "Marker", "Crayon"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Arts & Drawing",
+        question: "What do you get when you mix red and yellow colors?",
+        options: ["Green", "Orange", "Purple", "Brown"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Arts & Drawing",
+        question: "Which material is commonly used for watercolor painting?",
+        options: ["Canvas", "Watercolor Paper", "Wood", "Plastic Sheet"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Arts & Drawing",
+        question: "Which famous artist cut off part of his ear?",
+        options: [
+          "Vincent Van Gogh",
+          "Pablo Picasso",
+          "Leonardo da Vinci",
+          "Claude Monet",
+        ],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Arts & Drawing",
+        question:
+            "What is the art of making images with pencils, pens, or charcoal called?",
+        options: ["Painting", "Drawing", "Sculpture", "Photography"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Arts & Drawing",
+        question: "Which color is made by mixing blue and yellow?",
+        options: ["Green", "Purple", "Orange", "Pink"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Arts & Drawing",
+        question: "Which surface is commonly used for painting?",
+        options: ["Canvas", "Metal", "Glass", "Stone"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Arts & Drawing",
+        question: "What is shading used for in drawing?",
+        options: [
+          "Adding color",
+          "Creating depth and dimension",
+          "Cutting paper",
+          "Making lines straight",
+        ],
         correctIndex: 1,
       ),
     ],
+
     "Programming": [
       Question(
         title: "Programming",
