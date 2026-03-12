@@ -290,6 +290,74 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 1,
       ),
     ],
+
+    "Chemistry": [
+      Question(
+        title: "Chemistry",
+        question: "What is the chemical symbol for water?",
+        options: ["O2", "H2O", "CO2", "NaCl"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "Which gas do plants absorb from the atmosphere?",
+        options: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "What is the pH value of pure water?",
+        options: ["5", "6", "7", "8"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "Which element has the chemical symbol 'O'?",
+        options: ["Gold", "Oxygen", "Silver", "Iron"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "Which gas is known as laughing gas?",
+        options: ["Nitrous Oxide", "Carbon Monoxide", "Methane", "Hydrogen"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "What is the main gas found in the air we breathe?",
+        options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Helium"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "Which metal is liquid at room temperature?",
+        options: ["Mercury", "Iron", "Copper", "Aluminum"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "What is the chemical formula of carbon dioxide?",
+        options: ["CO", "CO2", "C2O", "O2C"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "Which acid is found in lemon?",
+        options: [
+          "Sulfuric acid",
+          "Nitric acid",
+          "Citric acid",
+          "Hydrochloric acid",
+        ],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Chemistry",
+        question: "What is the smallest unit of an element?",
+        options: ["Molecule", "Atom", "Cell", "Compound"],
+        correctIndex: 1,
+      ),
+    ],
   };
 
   @override
