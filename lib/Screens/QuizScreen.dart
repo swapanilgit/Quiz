@@ -18,7 +18,7 @@ class Question {
 }
 
 class QuizScreen extends StatefulWidget {
-  final title;
+  final String title;
 
   const QuizScreen(this.title, {super.key});
 
@@ -71,9 +71,24 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
     ],
 
-    "Computer": [
+    "Sports": [
       Question(
-        title: "Computer",
+        title: "Sports",
+        question: "Which country won the FIFA World Cup in 2018?",
+        options: ["Brazil", "Germany", "France", "Argentina"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Sports",
+        question: "How many players are there in a cricket team?",
+        options: ["9", "10", "11", "12"],
+        correctIndex: 2,
+      ),
+    ],
+
+    "Technology": [
+      Question(
+        title: "Technology",
         question: "What does CPU stand for?",
         options: [
           "Central Processing Unit",
@@ -84,9 +99,98 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 0,
       ),
       Question(
-        title: "Computer",
+        title: "Technology",
         question: "Which language is used to build Flutter apps?",
         options: ["Java", "Dart", "Python", "C++"],
+        correctIndex: 1,
+      ),
+    ],
+
+    "Physics": [
+      Question(
+        title: "Physics",
+        question: "What is the SI unit of force?",
+        options: ["Newton", "Joule", "Watt", "Pascal"],
+        correctIndex: 0,
+      ),
+
+      Question(
+        title: "Physics",
+        question: "What is the SI unit of speed?",
+        options: ["Kilometer", "Meter per second", "Second", "Meter"],
+        correctIndex: 1,
+      ),
+
+      Question(
+        title: "Physics",
+        question: "Newton's First Law of Motion is also commonly known as the?",
+        options: [
+          "Law of Universal Gravitation",
+          "Law of Action and Reaction",
+          "Law of Acceleration",
+          "Law of Inertia",
+        ],
+        correctIndex: 3,
+      ),
+
+      Question(
+        title: "Physics",
+        question:
+            "If the resultant force acting on a body of constant mass is zero, the body's momentum is?",
+        options: ["Increasing", "Decreasing", "Always zero", "Constant"],
+        correctIndex: 3,
+      ),
+
+      Question(
+        title: "Physics",
+        question: "Which of the following is a unit of angular velocity?",
+        options: [
+          "Radian",
+          "Radian per second (rad/s)",
+          "Meter per second",
+          "Newton",
+        ],
+        correctIndex: 1,
+      ),
+
+      Question(
+        title: "Physics",
+        question: "The energy possessed by a body due to its motion is called?",
+        options: ["Kinetic Energy", "Potential Energy", "Joule", "Watt"],
+        correctIndex: 0,
+      ),
+
+      Question(
+        title: "Physics",
+        question:
+            "What is the escape velocity required for a body to leave Earth's surface?",
+        options: ["9.8 km/s", "15.2 km/s", "10.3 km/s", "11.2 km/s"],
+        correctIndex: 3,
+      ),
+      Question(
+        title: "Physics",
+        question:
+            "What form of energy does a plant store when light is transformed during photosynthesis?",
+        options: [
+          "Light Energy",
+          "Heat Energy",
+          "Chemical Energy",
+          "Mechanical Energy",
+        ],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Physics",
+        question:
+            "Which particle was discovered by J.J. Thomson in 1897 using a cathode ray tube?",
+        options: ["Electron", "Proton", "Neutron", "Photon"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Physics",
+        question:
+            "The phenomenon of light bending as it passes from one medium to another is called?",
+        options: ["Reflection", "Refraction", "Diffraction", "Interference"],
         correctIndex: 1,
       ),
     ],
@@ -110,16 +214,93 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 1,
       ),
     ],
+    "Programming": [
+      Question(
+        title: "Programming",
+        question: "What is a variable in programming?",
+        options: [
+          "A fixed value",
+          "A container to store data",
+          "A loop statement",
+          "A type of function",
+        ],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Programming",
+        question:
+            "Which keyword is used to declare a variable in many languages like JavaScript?",
+        options: ["loop", "var", "print", "class"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Programming",
+        question:
+            "What will be the output?\n if x = 5 \n if(x > 3){\n\tprint('Hello');\n}?",
+        options: ["Nothing", "Hello", "Error", "5"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Programming",
+        question: "Which loop is used when the number of iterations is known?",
+        options: ["while loop", "do-while loop", "for loop", "switch"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Programming",
+        question: "Which operator is used to compare two values?",
+        options: ["=", "==", "++", "&&"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Programming",
+        question:
+            "What will be the output of: for(int i=0; i<3; i++) print(i);",
+        options: ["012", "123", "321", "Error"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Programming",
+        question: "Which statement is used to make decisions in programming?",
+        options: ["loop", "if", "break", "print"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Programming",
+        question: "What does the condition (a != b) mean?",
+        options: [
+          "a is equal to b",
+          "a is greater than b",
+          "a is not equal to b",
+          "a is less than b",
+        ],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Programming",
+        question:
+            "What will be the final value of x if x starts at 10 and decreases until x > 7?",
+        options: ["10", "8", "7", "6"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Programming Basics",
+        question: "Which data type is used to store text?",
+        options: ["int", "string", "float", "boolean"],
+        correctIndex: 1,
+      ),
+    ],
   };
 
   @override
   void initState() {
     super.initState();
 
-    // Load questions based on selected category
     questions = allQuestions[widget.title] ?? [];
 
-    startTimer();
+    if (questions.isNotEmpty) {
+      startTimer();
+    }
   }
 
   void startTimer() {
@@ -243,7 +424,20 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double progressValue = (currentIndex + 1) / questions.length;
+    double progressValue = questions.isEmpty
+        ? 0
+        : (currentIndex + 1) / questions.length;
+    if (questions.isEmpty) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF0F172A),
+        body: const Center(
+          child: Text(
+            "No questions available",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),

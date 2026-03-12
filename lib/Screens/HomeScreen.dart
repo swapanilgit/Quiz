@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<String> bottomLabels = ["Home","Rankings", "Profile"];
+  final List<String> bottomLabels = ["Home", "Rankings", "Profile"];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   buildCategoryCard(
                     icon: Icons.science,
                     title: "Science",
-                    
+
                     color: Colors.blue,
                     onTap: () {
                       Navigator.push(
@@ -191,6 +191,51 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const QuizScreen("History"),
+                        ),
+                      );
+                    },
+                    quizCount: '',
+                  ),
+
+                  buildCategoryCard(
+                    icon: Icons.science,
+                    title: "Physics",
+                    color: Colors.purple,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const QuizScreen("Physics"),
+                        ),
+                      );
+                    },
+                    quizCount: '',
+                  ),
+
+                  buildCategoryCard(
+                    icon: Icons.science_outlined,
+                    title: "Chemistry",
+                    color: Colors.purple,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const QuizScreen("Chemistry"),
+                        ),
+                      );
+                    },
+                    quizCount: '',
+                  ),
+
+                  buildCategoryCard(
+                    icon: Icons.code,
+                    title: "Programming",
+                    color: Colors.purple,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const QuizScreen("Programming"),
                         ),
                       );
                     },
@@ -226,6 +271,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     quizCount: '',
                   ),
+                  buildCategoryCard(
+                    icon: Icons.sports_esports,
+                    title: "Sports",
+                    color: Colors.green,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const QuizScreen("Sports"),
+                        ),
+                      );
+                    },
+                    quizCount: '',
+                  ),
                 ],
               ),
 
@@ -245,11 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          // BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Discover"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: "Rankings",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart),label: "Rankings",),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
