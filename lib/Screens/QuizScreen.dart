@@ -435,9 +435,9 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
     ],
 
-    "Arts & Drawing": [
+    "Art & Drawing": [
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "Who painted the famous artwork 'Mona Lisa'?",
         options: [
           "Vincent Van Gogh",
@@ -448,7 +448,7 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 1,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "Which colors are known as primary colors?",
         options: [
           "Red, Blue, Yellow",
@@ -459,25 +459,25 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 0,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "Which tool is commonly used for sketching?",
         options: ["Brush", "Pencil", "Marker", "Crayon"],
         correctIndex: 1,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "What do you get when you mix red and yellow colors?",
         options: ["Green", "Orange", "Purple", "Brown"],
         correctIndex: 1,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "Which material is commonly used for watercolor painting?",
         options: ["Canvas", "Watercolor Paper", "Wood", "Plastic Sheet"],
         correctIndex: 1,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "Which famous artist cut off part of his ear?",
         options: [
           "Vincent Van Gogh",
@@ -488,26 +488,26 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 0,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question:
             "What is the art of making images with pencils, pens, or charcoal called?",
         options: ["Painting", "Drawing", "Sculpture", "Photography"],
         correctIndex: 1,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "Which color is made by mixing blue and yellow?",
         options: ["Green", "Purple", "Orange", "Pink"],
         correctIndex: 0,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "Which surface is commonly used for painting?",
         options: ["Canvas", "Metal", "Glass", "Stone"],
         correctIndex: 0,
       ),
       Question(
-        title: "Arts & Drawing",
+        title: "Art & Drawing",
         question: "What is shading used for in drawing?",
         options: [
           "Adding color",

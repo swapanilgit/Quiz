@@ -12,6 +12,28 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    filteredCategories = allCategories;
+  }
+
+  TextEditingController searchController = TextEditingController();
+
+  List<Map<String, dynamic>> allCategories = [
+    {"title": "Science", "icon": Icons.science, "color": Colors.blue},
+    {"title": "Indian History","icon": Icons.history_edu,"color": Colors.orange,},
+    {"title": "Physics", "icon": Icons.science, "color": Colors.purple},
+    {"title": "Chemistry","icon": Icons.science_outlined,"color": Colors.purple,},
+    {"title": "Programming", "icon": Icons.code, "color": Colors.purple},
+    {"title": "Computer", "icon": Icons.memory, "color": Colors.purple},
+    {"title": "Art & Drawing", "icon": Icons.palette, "color": Colors.red},
+    {"title": "Sports", "icon": Icons.sports_esports, "color": Colors.green},
+    {"title": "GeneralKnowledge", "icon": Icons.school, "color": const Color.fromARGB(255, 112, 87, 87)},
+  ];
+
+  List<Map<String, dynamic>> filteredCategories = [];
+
   int _selectedIndex = 0;
 
   final List<String> bottomLabels = ["Home", "Rankings", "Profile"];
@@ -29,6 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void searchCategory(String query) {
+    final results = allCategories.where((category) {
+      return category["title"].toLowerCase().contains(query.toLowerCase());
+    }).toList();
+
+    setState(() {
+      filteredCategories = results;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,9 +98,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: const Color(0xFF1E293B),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const TextField(
-                  style: TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
+                child: TextField(
+                  controller: searchController,
+                  onChanged: searchCategory,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
                     icon: Icon(Icons.search, color: Colors.white54),
                     hintText: "Search topics, quizzes or users...",
                     hintStyle: TextStyle(color: Colors.white54),
@@ -158,6 +191,135 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
 
               /// Categories Grid
+              // GridView.count(
+              //   crossAxisCount: 2,
+              //   shrinkWrap: true,
+              //   physics: const NeverScrollableScrollPhysics(),
+              //   crossAxisSpacing: 15,
+              //   mainAxisSpacing: 15,
+              //   childAspectRatio: 1.1,
+              //   children: [
+              //     buildCategoryCard(
+              //       icon: Icons.science,
+              //       title: "Science",
+
+              //       color: Colors.blue,
+              //       onTap: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (_) => const QuizScreen('Science'),
+              //           ),
+              //         );
+              //       },
+              //       quizCount: '',
+              //     ),
+
+              //     buildCategoryCard(
+              //       icon: Icons.history_edu,
+              //       title: "Indian History",
+              //       color: Colors.orange,
+              //       onTap: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (_) => const QuizScreen("Indian History"),
+              //           ),
+              //         );
+              //       },
+              //       quizCount: '',
+              //     ),
+
+              //     buildCategoryCard(
+              //       icon: Icons.science,
+              //       title: "Physics",
+              //       color: Colors.purple,
+              //       onTap: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (_) => const QuizScreen("Physics"),
+              //           ),
+              //         );
+              //       },
+              //       quizCount: '',
+              //     ),
+
+              //     buildCategoryCard(
+              //       icon: Icons.science_outlined,
+              //       title: "Chemistry",
+              //       color: Colors.purple,
+              //       onTap: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (_) => const QuizScreen("Chemistry"),
+              //           ),
+              //         );
+              //       },
+              //       quizCount: '',
+              //     ),
+
+              //     buildCategoryCard(
+              //       icon: Icons.code,
+              //       title: "Programming",
+              //       color: Colors.purple,
+              //       onTap: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (_) => const QuizScreen("Programming"),
+              //           ),
+              //         );
+              //       },
+              //       quizCount: '',
+              //     ),
+
+              //     buildCategoryCard(
+              //       icon: Icons.memory,
+              //       title: "Computer",
+              //       color: Colors.purple,
+              //       onTap: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (_) => const QuizScreen("Computer"),
+              //           ),
+              //         );
+              //       },
+              //       quizCount: '',
+              //     ),
+
+              //     buildCategoryCard(
+              //       icon: Icons.palette,
+              //       title: "Art & Drawing",
+              //       color: Colors.red,
+              //       onTap: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (_) => const QuizScreen("Art & Drawing"),
+              //           ),
+              //         );
+              //       },
+              //       quizCount: '',
+              //     ),
+              //     buildCategoryCard(
+              //       icon: Icons.sports_esports,
+              //       title: "Sports",
+              //       color: Colors.green,
+              //       onTap: () {
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //             builder: (_) => const QuizScreen("Sports"),
+              //           ),
+              //         );
+              //       },
+              //       quizCount: '',
+              //     ),
+              //   ],
+              // ),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -165,129 +327,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
                 childAspectRatio: 1.1,
-                children: [
-                  buildCategoryCard(
-                    icon: Icons.science,
-                    title: "Science",
-
-                    color: Colors.blue,
+                children: filteredCategories.map((category) {
+                  return buildCategoryCard(
+                    
+                    icon: category["icon"],
+                    title: category["title"],
+                    color: category["color"],
+                    quizCount: '',
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const QuizScreen('Science'),
+                          builder: (_) => QuizScreen(category["title"]),
                         ),
                       );
                     },
-                    quizCount: '',
-                  ),
-
-                  buildCategoryCard(
-                    icon: Icons.history_edu,
-                    title: "Indian History",
-                    color: Colors.orange,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Indian History"),
-                        ),
-                      );
-                    },
-                    quizCount: '',
-                  ),
-
-                  buildCategoryCard(
-                    icon: Icons.science,
-                    title: "Physics",
-                    color: Colors.purple,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Physics"),
-                        ),
-                      );
-                    },
-                    quizCount: '',
-                  ),
-
-                  buildCategoryCard(
-                    icon: Icons.science_outlined,
-                    title: "Chemistry",
-                    color: Colors.purple,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Chemistry"),
-                        ),
-                      );
-                    },
-                    quizCount: '',
-                  ),
-
-                  buildCategoryCard(
-                    icon: Icons.code,
-                    title: "Programming",
-                    color: Colors.purple,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Programming"),
-                        ),
-                      );
-                    },
-                    quizCount: '',
-                  ),
-
-                  buildCategoryCard(
-                    icon: Icons.memory,
-                    title: "Computer",
-                    color: Colors.purple,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Computer"),
-                        ),
-                      );
-                    },
-                    quizCount: '',
-                  ),
-
-                  buildCategoryCard(
-                    icon: Icons.palette,
-                    title: "Art & Drawing",
-                    color: Colors.red,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Art & Drawing"),
-                        ),
-                      );
-                    },
-                    quizCount: '',
-                  ),
-                  buildCategoryCard(
-                    icon: Icons.sports_esports,
-                    title: "Sports",
-                    color: Colors.green,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizScreen("Sports"),
-                        ),
-                      );
-                    },
-                    quizCount: '',
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
-
               const SizedBox(height: 30),
             ],
           ),
@@ -304,7 +361,10 @@ class _HomeScreenState extends State<HomeScreen> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart),label: "Rankings",),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: "Rankings",
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
