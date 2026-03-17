@@ -29,27 +29,26 @@ class _HomeScreenState extends State<HomeScreen> {
     {"title": "Computer", "icon": Icons.memory, "color": Colors.purple},
     {"title": "Art & Drawing", "icon": Icons.palette, "color": Colors.red},
     {"title": "Sports", "icon": Icons.sports_esports, "color": Colors.green},
-    {"title": "GeneralKnowledge", "icon": Icons.school, "color": const Color.fromARGB(255, 112, 87, 87)},
   ];
 
   List<Map<String, dynamic>> filteredCategories = [];
 
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
 
-  final List<String> bottomLabels = ["Home", "Rankings", "Profile"];
+  // final List<String> bottomLabels = ["Home", "Search", "Profile"];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  // void _onItemTapped(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //   });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("${bottomLabels[index]} Clicked"),
-        duration: const Duration(milliseconds: 500),
-      ),
-    );
-  }
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text("${bottomLabels[index]} Clicked"),
+  //       duration: const Duration(milliseconds: 500),
+  //     ),
+  //   );
+  // }
 
   void searchCategory(String query) {
     final results = allCategories.where((category) {
@@ -351,23 +350,21 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      /// Bottom Navigation
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF0F172A),
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.white54,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: "Rankings",
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
-      ),
+      // /// Bottom Navigation
+      // bottomNavigationBar: BottomNavigationBar(
+      //   backgroundColor: const Color(0xFF0F172A),
+      //   selectedItemColor: Colors.blue,
+      //   unselectedItemColor: Colors.white54,
+      //   currentIndex: _selectedIndex,
+      //   onTap: _onItemTapped,
+      //   type: BottomNavigationBarType.fixed,
+      //   items: const [
+      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home",),
+      //     BottomNavigationBarItem(icon: Icon(Icons.search),label: "Search",
+      //     ),
+      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+      //   ],
+      // ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quiz/Screens/HomeScreen.dart';
+// import 'package:quiz/Screens/HomeScreen.dart';
+import 'package:quiz/Screens/ProfileScreen.dart';
 // import 'package:quiz/Screens/QuizScreen.dart';
 // import 'Screens/login_screen.dart';
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Brain Byte',
       theme: ThemeData.dark(),
-      home: HomeScreen(),
+      home: MainScreen(),
     );
   }
 }
