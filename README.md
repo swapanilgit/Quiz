@@ -1,84 +1,64 @@
-# Brain Byte
+# 📱 Quiz App
+
 A modern and interactive Quiz Application built using Flutter that allows users to test their knowledge across multiple topics with a smooth and engaging user experience.
 
-🚀 Features
+---
 
-🎯 Multiple categories of quizzes
+## 🚀 Features
 
-🔀 Random question generation
+- 🎯 Multiple quiz categories  
+- 🔀 Random question generation  
+- ✅ Instant answer validation  
+- 📊 Detailed result screen  
+- 📖 Answer review (correct vs incorrect)  
+- 💾 Local data storage (Hive)  
+- 🎨 Clean and responsive UI  
+- ⚡ Fast performance  
 
-✅ Instant feedback on answers (correct/incorrect)
+---
 
-📊 Review screen with correct answers and user responses
+## 🛠️ Tech Stack
 
-💾 Local data storage for quiz progress
+| Technology | Usage |
+|------------|------|
+| Flutter    | UI Development |
+| Dart       | Programming Language |
+| Hive       | Local Storage |
+| Material UI| Design System |
 
-🎨 Clean and responsive UI
+---
+## 📸 App Screens
 
-⚡ Fast and lightweight performance
+- 🏠 Home Screen  
+- 📝 Quiz Screen  
+- 📊 Result Screen  
+- 📖 Review Answers Screen  
 
-🛠️ Tech Stack
+---
 
-Flutter – UI development
+## Getting Started
 
-Dart – Programming language
+To run this project locally, ensure you have Flutter installed on your machine.
 
-Hive / Local Storage – Data persistence
-
-Material UI – Design components
-
-📂 Project Structure
-lib/
- ├── Screens/
- ├── Models/
- ├── Widgets/
- ├── Services/
- └── main.dart
-📸 Screens Included
-
-Home Screen
-
-Quiz Screen
-
-Result Screen
-
-Review Answer Screen
-
-▶️ How to Run
-
-Clone the repository:
-
-git clone <your-repo-link>
-
-Navigate to the project:
+**1. Clone the repository**
+```bash
+git clone https://github.com/swapanilgit/quiz_app.git
 
 cd quiz_app
-
-Install dependencies:
-
+```
+**2. Install dependencies**
+```bash
 flutter pub get
-
-Run the app:
-
+```
+**3. Run the app**
+```bash
 flutter run
-📦 APK Download
+```
 
-You can directly install the app using the APK file provided in this repository.
+## Build for Android (APK)
+To generate a standalone APK file to install on your Android device:
+```bash
+flutter build apk --release
+```
 
-🎯 Future Improvements
-
-🔐 User authentication
-
-🌐 Online leaderboard
-
-🧠 AI-based question suggestions
-
-📈 Performance analytics
-
-🤝 Contributing
-
-Contributions are welcome! Feel free to fork the repo and submit a pull request.
-
-📄 License
-
-This project is open-source and available under the MIT License.
+The compiled APK will be located at: build/app/outputs/flutter-apk/app-release.apk
