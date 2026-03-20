@@ -1,16 +1,84 @@
-# quiz
+# Brain Byte
+A modern and interactive Quiz Application built using Flutter that allows users to test their knowledge across multiple topics with a smooth and engaging user experience.
 
-A new Flutter project.
+🚀 Features
 
-## Getting Started
+🎯 Multiple categories of quizzes
 
-This project is a starting point for a Flutter application.
+🔀 Random question generation
 
-A few resources to get you started if this is your first Flutter project:
+✅ Instant feedback on answers (correct/incorrect)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+📊 Review screen with correct answers and user responses
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+💾 Local data storage for quiz progress
+
+🎨 Clean and responsive UI
+
+⚡ Fast and lightweight performance
+
+🛠️ Tech Stack
+
+Flutter – UI development
+
+Dart – Programming language
+
+Hive / Local Storage – Data persistence
+
+Material UI – Design components
+
+📂 Project Structure
+lib/
+ ├── Screens/
+ ├── Models/
+ ├── Widgets/
+ ├── Services/
+ └── main.dart
+📸 Screens Included
+
+Home Screen
+
+Quiz Screen
+
+Result Screen
+
+Review Answer Screen
+
+▶️ How to Run
+
+Clone the repository:
+
+git clone <your-repo-link>
+
+Navigate to the project:
+
+cd quiz_app
+
+Install dependencies:
+
+flutter pub get
+
+Run the app:
+
+flutter run
+📦 APK Download
+
+You can directly install the app using the APK file provided in this repository.
+
+🎯 Future Improvements
+
+🔐 User authentication
+
+🌐 Online leaderboard
+
+🧠 AI-based question suggestions
+
+📈 Performance analytics
+
+🤝 Contributing
+
+Contributions are welcome! Feel free to fork the repo and submit a pull request.
+
+📄 License
+
+This project is open-source and available under the MIT License.
