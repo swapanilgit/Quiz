@@ -6,14 +6,14 @@ A modern and interactive Quiz Application built using Flutter that allows users 
 
 ## 🚀 Features
 
-- 🎯 Multiple quiz categories
-- 🔀 Random question generation
-- ✅ Instant answer validation
-- 📊 Detailed result screen
-- 📖 Answer review (correct vs incorrect)
-- 💾 Local data storage (Hive)
-- 🎨 Clean and responsive UI
-- ⚡ Fast performance
+- 🎯 Multiple quiz categories  
+- 🔀 Random question generation  
+- ✅ Instant answer validation  
+- 📊 Detailed result screen  
+- 📖 Answer review (correct vs incorrect)  
+- 💾 Local data storage (Hive)  
+- 🎨 Clean and responsive UI  
+- ⚡ Fast performance  
 
 ---
 
@@ -29,10 +29,10 @@ A modern and interactive Quiz Application built using Flutter that allows users 
 ---
 ## 📸 App Screens
 
-- 🏠 Home Screen
-- 📝 Quiz Screen
-- 📊 Result Screen
-- 📖 Review Answers Screen
+- 🏠 Home Screen  
+- 📝 Quiz Screen  
+- 📊 Result Screen  
+- 📖 Review Answers Screen  
 
 ---
 
