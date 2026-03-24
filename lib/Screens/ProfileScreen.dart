@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quiz/Screens/HomeScreen.dart';
 import 'package:quiz/Screens/QuizHistoryPage.dart';
+import 'package:quiz/Screens/QuizScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -821,74 +822,148 @@ PreferredSizeWidget _darkAppBar(BuildContext context, String title) => AppBar(
 
 
 // ── Saved Quizzes ─────────────────────────────────────────────────────────────
-class SavedQuizzesPage extends StatelessWidget {
+class SavedQuizzesPage extends StatefulWidget {
   const SavedQuizzesPage({super.key});
 
-  static const _quizzes = [
-    'Advanced Data Structures',
-    'Operating Systems 101',
-    'Boolean Algebra',
-    'Discrete Math',
-  ];
+  @override
+  State<SavedQuizzesPage> createState() => _SavedQuizzesPageState();
+}
+
+class _SavedQuizzesPageState extends State<SavedQuizzesPage> {
+  late Future<List<Map<String, dynamic>>> _savedQuizzesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _savedQuizzesFuture = UserCache.loadSavedQuizzes();
+  }
+
+  Future<void> _refreshSavedQuizzes() async {
+    setState(() {
+      _savedQuizzesFuture = UserCache.loadSavedQuizzes();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: _darkAppBar(context, 'Saved Quizzes'),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(20),
-        itemCount: _quizzes.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (_, i) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                _quizzes[i],
-                style: const TextStyle(fontSize: 14, color: AppColors.text),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _savedQuizzesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final savedQuizzes = snapshot.data ?? [];
+
+          if (savedQuizzes.isEmpty) {
+            return const Center(
+              child: Text(
+                'No saved quizzes yet',
+                style: TextStyle(color: AppColors.subtext),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.indigo,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
+            );
+          }
+
+          return ListView.separated(
+            padding: const EdgeInsets.all(20),
+            itemCount: savedQuizzes.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (_, i) {
+              final quiz = savedQuizzes[i];
+              final title = quiz['title'] as String? ?? 'Quiz';
+              final useRandomSelection =
+                  quiz['useRandomSelection'] as bool? ?? false;
+              final randomQuestionCount =
+                  quiz['randomQuestionCount'] as int? ?? 10;
+
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
                 ),
-                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Starting: ${_quizzes[i]}',
-                      style: const TextStyle(color: AppColors.text),
-                    ),
-                    backgroundColor: AppColors.surface,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      side: const BorderSide(color: AppColors.border),
-                    ),
-                  ),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.border),
                 ),
-                child: const Text('Start'),
-              ),
-            ],
-          ),
-        ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.text,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            useRandomSelection
+                                ? 'Random quiz • $randomQuestionCount questions'
+                                : 'Category quiz',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.subtext,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        await UserCache.removeSavedQuiz(
+                          quiz['id'] as String? ?? '',
+                        );
+                        _refreshSavedQuizzes();
+                      },
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.subtext,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.indigo,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => QuizScreen(
+                              title,
+                              useRandomSelection: useRandomSelection,
+                              randomQuestionCount: randomQuestionCount,
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text('Start'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

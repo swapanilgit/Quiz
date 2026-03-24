@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import "package:flutter/material.dart";
 import 'package:quiz/Screens/AnsweredQuestion.dart';
@@ -35,8 +36,15 @@ class Question {
 
 class QuizScreen extends StatefulWidget {
   final String title;
+  final bool useRandomSelection;
+  final int randomQuestionCount;
 
-  const QuizScreen(this.title, {super.key});
+  const QuizScreen(
+    this.title, {
+    super.key,
+    this.useRandomSelection = false,
+    this.randomQuestionCount = 10,
+  });
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -51,6 +59,8 @@ class _QuizScreenState extends State<QuizScreen> {
   late List<Question> questions;
   bool isTimeUp = false;
   bool _isSaved = false;
+  bool _isShowingResult = false;
+  bool _isQuizSaved = false;
 
   List<AnsweredQuestion> answered = [];
 
@@ -701,26 +711,22 @@ class _QuizScreenState extends State<QuizScreen> {
   void initState() {
     super.initState();
 
-    questions = allQuestions[widget.title] ?? [];
+    if (widget.useRandomSelection) {
+      final random = Random();
+      final mixedQuestions = allQuestions.values.expand((items) => items).toList()
+        ..shuffle(random);
+      final count = mixedQuestions.length < widget.randomQuestionCount
+          ? mixedQuestions.length
+          : widget.randomQuestionCount;
+      questions = mixedQuestions.take(count).toList();
+    } else {
+      questions = allQuestions[widget.title] ?? [];
+    }
 
-    // if (questions.isNotEmpty) {
-    //   startTimer();
-    // }
+    if (questions.isNotEmpty) {
+      restartTimer();
+    }
   }
-
-  // void startTimer() {
-  //   timer?.cancel(); // ✅ prevent duplicate timers
-
-  //   timer = Timer.periodic(const Duration(seconds: 1), (t) {
-  //     if (seconds == 0) {
-  //       t.cancel();
-  //     } else {
-  //       setState(() {
-  //         seconds--;
-  //       });
-  //     }
-  //   });
-  // }
 
   @override
   void dispose() {
@@ -729,6 +735,8 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void autoNextQuestion() {
+    recordAnswer();
+
     // DO NOT increase score if nothing selected
     if (selectedIndex == questions[currentIndex].correctIndex) {
       score++;
@@ -744,25 +752,28 @@ class _QuizScreenState extends State<QuizScreen> {
       timer?.cancel();
       showResult();
     }
-    recordAnswer();
   }
 
   void restartTimer() {
     timer?.cancel();
     isTimeUp = false;
     seconds = 15;
+    _isShowingResult = false;
 
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (seconds == 0) {
         t.cancel();
+        if (!mounted) return;
         setState(() {
           isTimeUp = true;
         });
 
         Future.delayed(const Duration(milliseconds: 400), () {
+          if (!mounted || _isShowingResult) return;
           autoNextQuestion();
         });
       } else {
+        if (!mounted) return;
         setState(() {
           seconds--;
         });
@@ -771,6 +782,10 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void showResult() async {
+    if (_isShowingResult) return;
+    _isShowingResult = true;
+    timer?.cancel();
+
     if (!_isSaved) {
       await UserCache.recordAttempt(
         category: widget.title,
@@ -817,18 +832,9 @@ class _QuizScreenState extends State<QuizScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainScreen()),
-              );
-              setState(() {
-                currentIndex = 0;
-                score = 0;
-                selectedIndex = -1;
-                seconds = 15;
-                _isSaved = false; // reset for next quiz
-              });
-              restartTimer();
+              timer?.cancel();
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
             },
             child: const Text("Exit"),
           ),
@@ -844,6 +850,31 @@ class _QuizScreenState extends State<QuizScreen> {
     //     ),
     //   ),
     // );
+  }
+
+  Future<void> saveCurrentQuiz() async {
+    if (_isQuizSaved) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Quiz already saved")));
+      return;
+    }
+
+    await UserCache.saveQuiz(
+      title: widget.title,
+      useRandomSelection: widget.useRandomSelection,
+      randomQuestionCount: widget.randomQuestionCount,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isQuizSaved = true;
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Quiz saved successfully")));
   }
 
   void submitAnswer() {
@@ -880,10 +911,6 @@ class _QuizScreenState extends State<QuizScreen> {
     double progressValue = questions.isEmpty
         ? 0
         : (currentIndex + 1) / questions.length;
-
-    if (questions.isNotEmpty && timer == null) {
-      restartTimer(); // ✅ start only once
-    }
     if (questions.isEmpty) {
       return Scaffold(
         backgroundColor: const Color(0xFF0F172A),
@@ -916,14 +943,20 @@ class _QuizScreenState extends State<QuizScreen> {
                   Text(
                     "${widget.title} Quiz",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.text,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const CircleAvatar(
-                    backgroundColor: Colors.white24,
-                    child: Icon(Icons.help_outline, color: Colors.white),
+                  IconButton(
+                    onPressed: saveCurrentQuiz,
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.border,
+                    ),
+                    icon: Icon(
+                      _isQuizSaved ? Icons.bookmark : Icons.bookmark_border,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),

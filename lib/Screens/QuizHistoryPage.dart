@@ -226,49 +226,71 @@ class _QuizHistoryPageState extends State<QuizHistoryPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) {
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: attempt.questions.length,
-          itemBuilder: (_, i) {
-            final q = attempt.questions[i];
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 48,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  itemCount: attempt.questions.length,
+                  itemBuilder: (_, i) {
+                    final q = attempt.questions[i];
 
-            return Card(
-              margin: const EdgeInsets.only(bottom: 10),
-              color: q.isCorrect ? AppColors.card : AppColors.redBg,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                title: Text(
-                  q.question,
-                  style: const TextStyle(color: AppColors.text),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Your: ${q.selectedAnswer}',
-                      style: const TextStyle(color: AppColors.subtext),
-                    ),
-                    if (!q.isCorrect)
-                      Text(
-                        'Correct: ${q.correctAnswer}',
-                        style: const TextStyle(color: AppColors.indigoLight),
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      color: q.isCorrect ? AppColors.card : AppColors.redBg,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                  ],
-                ),
-                trailing: Icon(
-                  q.isCorrect ? Icons.check : Icons.close,
-                  color: q.isCorrect ? AppColors.indigo : AppColors.red,
+                      child: ListTile(
+                        title: Text(
+                          q.question,
+                          style: const TextStyle(color: AppColors.text),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Your: ${q.selectedAnswer}',
+                              style: const TextStyle(color: AppColors.subtext),
+                            ),
+                            if (!q.isCorrect)
+                              Text(
+                                'Correct: ${q.correctAnswer}',
+                                style: const TextStyle(
+                                  color: AppColors.indigoLight,
+                                ),
+                              ),
+                          ],
+                        ),
+                        trailing: Icon(
+                          q.isCorrect ? Icons.check : Icons.close,
+                          color: q.isCorrect ? AppColors.indigo : AppColors.red,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            );
-          },
+            ],
+          ),
         );
       },
     );

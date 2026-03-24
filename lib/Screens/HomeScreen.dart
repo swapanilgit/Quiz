@@ -186,7 +186,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const QuizScreen("Computer"),
+                            builder: (_) => const QuizScreen(
+                              "Weekly Special",
+                              useRandomSelection: true,
+                            ),
                           ),
                         );
                       },

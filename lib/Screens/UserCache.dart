@@ -115,6 +115,7 @@ class _Keys {
   static const profile = 'user_profile';
   static const stats = 'user_stats';
   static const history = 'quiz_history';
+  static const savedQuizzes = 'saved_quizzes';
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -192,6 +193,64 @@ class UserCache {
     if (!data.containsKey(category)) return [];
 
     return List<Map<String, dynamic>>.from(data[category]);
+  }
+
+  static Future<void> saveQuiz({
+    required String title,
+    bool useRandomSelection = false,
+    int randomQuestionCount = 10,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_Keys.savedQuizzes);
+    final List<Map<String, dynamic>> saved = raw == null
+        ? []
+        : List<Map<String, dynamic>>.from(
+            (jsonDecode(raw) as List).map((e) => Map<String, dynamic>.from(e)),
+          );
+
+    saved.removeWhere(
+      (item) =>
+          item['title'] == title &&
+          item['useRandomSelection'] == useRandomSelection &&
+          item['randomQuestionCount'] == randomQuestionCount,
+    );
+
+    saved.add({
+      'id': '${title}_$useRandomSelection\_$randomQuestionCount',
+      'title': title,
+      'useRandomSelection': useRandomSelection,
+      'randomQuestionCount': randomQuestionCount,
+      'savedAt': DateTime.now().toIso8601String(),
+    });
+
+    await prefs.setString(_Keys.savedQuizzes, jsonEncode(saved));
+  }
+
+  static Future<List<Map<String, dynamic>>> loadSavedQuizzes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_Keys.savedQuizzes);
+    if (raw == null) return [];
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return [];
+
+      return decoded
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList()
+          .reversed
+          .toList();
+    } catch (e) {
+      debugPrint('[UserCache] Failed to parse saved quizzes: $e');
+      return [];
+    }
+  }
+
+  static Future<void> removeSavedQuiz(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = await loadSavedQuizzes();
+    saved.removeWhere((item) => item['id'] == id);
+    await prefs.setString(_Keys.savedQuizzes, jsonEncode(saved.reversed.toList()));
   }
 
   // ── Profile ──────────────────────────────────────────────
@@ -308,6 +367,7 @@ class UserCache {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_Keys.profile);
     await prefs.remove(_Keys.stats);
+    await prefs.remove(_Keys.savedQuizzes);
     debugPrint('[UserCache] All data cleared.');
   }
 
