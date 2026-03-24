@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-// import 'package:quiz/Screens/HomeScreen.dart';
 import 'package:quiz/Screens/ProfileScreen.dart';
-// import 'package:quiz/Screens/QuizScreen.dart';
-// import 'Screens/login_screen.dart';
+import 'package:quiz/Screens/UserCache.dart';
 
-void main() {
+Future<void> main() async {
+  await UserCache.init();
   runApp(const MyApp());
 }
 
@@ -22,4 +21,21 @@ class MyApp extends StatelessWidget {
       home: MainScreen(),
     );
   }
+}
+
+class TestScreen extends StatelessWidget {
+  const TestScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Test Screen'),
+      ),
+      body: const Center(
+        child: Text('This is the test screen.',style: TextStyle(color: Colors.white,fontSize: 25),),
+      ),
+    );
+  }
+
 }

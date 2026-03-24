@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import "package:flutter/material.dart";
+import 'package:quiz/Screens/AnsweredQuestion.dart';
+import 'package:quiz/Screens/ProfileScreen.dart';
+import 'package:quiz/Screens/UserCache.dart';
 
 class Question {
   final String question;
@@ -16,6 +19,19 @@ class Question {
     required this.correctIndex,
   });
 }
+
+// class AnsweredQuestion {
+//   final String question;
+//   final String correctAnswer;
+//   final String userAnswer;
+
+//   AnsweredQuestion({
+//     required this.question,
+//     required this.correctAnswer,
+//     required this.userAnswer,
+//   });
+
+// }
 
 class QuizScreen extends StatefulWidget {
   final String title;
@@ -34,6 +50,22 @@ class _QuizScreenState extends State<QuizScreen> {
   Timer? timer;
   late List<Question> questions;
   bool isTimeUp = false;
+  bool _isSaved = false;
+
+  List<AnsweredQuestion> answered = [];
+
+  void recordAnswer() {
+    answered.add(
+      AnsweredQuestion(
+        question: questions[currentIndex].question,
+        correctAnswer: questions[currentIndex]
+            .options[questions[currentIndex].correctIndex],
+        userAnswer: selectedIndex == -1
+            ? "Not Answered"
+            : questions[currentIndex].options[selectedIndex],
+      ),
+    );
+  }
 
   final Map<String, List<Question>> allQuestions = {
     "Science": [
@@ -671,22 +703,24 @@ class _QuizScreenState extends State<QuizScreen> {
 
     questions = allQuestions[widget.title] ?? [];
 
-    if (questions.isNotEmpty) {
-      startTimer();
-    }
+    // if (questions.isNotEmpty) {
+    //   startTimer();
+    // }
   }
 
-  void startTimer() {
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (seconds == 0) {
-        t.cancel();
-      } else {
-        setState(() {
-          seconds--;
-        });
-      }
-    });
-  }
+  // void startTimer() {
+  //   timer?.cancel(); // ✅ prevent duplicate timers
+
+  //   timer = Timer.periodic(const Duration(seconds: 1), (t) {
+  //     if (seconds == 0) {
+  //       t.cancel();
+  //     } else {
+  //       setState(() {
+  //         seconds--;
+  //       });
+  //     }
+  //   });
+  // }
 
   @override
   void dispose() {
@@ -710,6 +744,7 @@ class _QuizScreenState extends State<QuizScreen> {
       timer?.cancel();
       showResult();
     }
+    recordAnswer();
   }
 
   void restartTimer() {
@@ -735,8 +770,38 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-  void showResult() {
+  void showResult() async {
+    if (!_isSaved) {
+      await UserCache.recordAttempt(
+        category: widget.title,
+        score: score,
+        total: questions.length,
+      );
+      await UserCache.saveQuizAttempt(
+        attempt: {
+          'id': DateTime.now().millisecondsSinceEpoch.toString(),
+          'subject': widget.title,
+          'date': DateTime.now().toIso8601String(),
+          'totalQuestions': questions.length,
+          'correctAnswers': score,
+          'questions': answered
+              .map(
+                (q) => {
+                  'questionNo': answered.indexOf(q) + 1,
+                  'question': q.question,
+                  'correctAnswer': q.correctAnswer,
+                  'selectedAnswer': q.userAnswer,
+                  'isCorrect': q.userAnswer == q.correctAnswer,
+                },
+              )
+              .toList(),
+        },
+      );
+      _isSaved = true;
+    }
+
     showDialog(
+      // ignore: use_build_context_synchronously
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
@@ -752,20 +817,33 @@ class _QuizScreenState extends State<QuizScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MainScreen()),
+              );
               setState(() {
                 currentIndex = 0;
                 score = 0;
                 selectedIndex = -1;
                 seconds = 15;
+                _isSaved = false; // reset for next quiz
               });
               restartTimer();
             },
-            child: const Text("Restart"),
+            child: const Text("Exit"),
           ),
         ],
       ),
     );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => ReviewScreen(
+    //       category: widget.title,
+    //       answered: answered, // ✅ PASS REAL DATA
+    //     ),
+    //   ),
+    // );
   }
 
   void submitAnswer() {
@@ -784,6 +862,8 @@ class _QuizScreenState extends State<QuizScreen> {
       score++;
     }
 
+    recordAnswer();
+
     if (currentIndex < questions.length - 1) {
       setState(() {
         currentIndex++;
@@ -800,6 +880,10 @@ class _QuizScreenState extends State<QuizScreen> {
     double progressValue = questions.isEmpty
         ? 0
         : (currentIndex + 1) / questions.length;
+
+    if (questions.isNotEmpty && timer == null) {
+      restartTimer(); // ✅ start only once
+    }
     if (questions.isEmpty) {
       return Scaffold(
         backgroundColor: const Color(0xFF0F172A),

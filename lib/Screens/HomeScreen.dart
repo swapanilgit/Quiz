@@ -1,4 +1,3 @@
-// ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
 import 'package:quiz/Screens/QuizScreen.dart';
@@ -22,9 +21,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Map<String, dynamic>> allCategories = [
     {"title": "Science", "icon": Icons.science, "color": Colors.blue},
-    {"title": "Indian History","icon": Icons.history_edu,"color": Colors.orange,},
+    {
+      "title": "Indian History",
+      "icon": Icons.history_edu,
+      "color": Colors.orange,
+    },
     {"title": "Physics", "icon": Icons.science, "color": Colors.purple},
-    {"title": "Chemistry","icon": Icons.science_outlined,"color": Colors.purple,},
+    {
+      "title": "Chemistry",
+      "icon": Icons.science_outlined,
+      "color": Colors.purple,
+    },
     {"title": "Programming", "icon": Icons.code, "color": Colors.purple},
     {"title": "Computer", "icon": Icons.memory, "color": Colors.purple},
     {"title": "Art & Drawing", "icon": Icons.palette, "color": Colors.red},
@@ -58,7 +65,14 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       filteredCategories = results;
     });
+
+    (value) {
+      setState(() {
+        searchCategory(value);
+      });
+    };
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,23 +105,43 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
 
               /// Search Bar
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextField(
-                  controller: searchController,
-                  onChanged: searchCategory,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.search, color: Colors.white54),
-                    hintText: "Search topics, quizzes or users...",
-                    hintStyle: TextStyle(color: Colors.white54),
-                    border: InputBorder.none,
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E293B),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: searchCategory,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          icon: const Icon(Icons.search, color: Colors.white54),
+                          hintText: "Search topics, quizzes or users...",
+                          hintStyle: const TextStyle(color: Colors.white54),
+                          border: InputBorder.none,
+
+                          /// 👇 Clear button
+                          suffixIcon: searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(
+                                    Icons.close,
+                                    color: Colors.white54,
+                                  ),
+                                  onPressed: () {
+                                    searchController.clear();
+                                    searchCategory(""); // reset search
+                                  },
+                                )
+                              : null,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
 
               const SizedBox(height: 30),
@@ -123,14 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("See All Clicked")),
-                      );
-                    },
-                    child: const Text("See All"),
                   ),
                 ],
               ),
@@ -151,14 +177,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Chip(
-                      label: Text("WEEKLY SPECIAL"),
+                  children: [
+                    ActionChip(
+                      label: const Text("WEEKLY SPECIAL"),
                       backgroundColor: Colors.blue,
-                      labelStyle: TextStyle(color: Colors.white),
+                      labelStyle: const TextStyle(color: Colors.white),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const QuizScreen("Computer"),
+                          ),
+                        );
+                      },
                     ),
-                    SizedBox(height: 10),
-                    Text(
+                    const SizedBox(height: 10),
+                    const Text(
                       "Cosmic Wonders",
                       style: TextStyle(
                         color: Colors.white,
@@ -166,8 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 5),
-                    Text(
+                    const SizedBox(height: 5),
+                    const Text(
                       "Test your space knowledge",
                       style: TextStyle(color: Colors.white70),
                     ),
@@ -189,136 +223,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 20),
 
-              /// Categories Grid
-              // GridView.count(
-              //   crossAxisCount: 2,
-              //   shrinkWrap: true,
-              //   physics: const NeverScrollableScrollPhysics(),
-              //   crossAxisSpacing: 15,
-              //   mainAxisSpacing: 15,
-              //   childAspectRatio: 1.1,
-              //   children: [
-              //     buildCategoryCard(
-              //       icon: Icons.science,
-              //       title: "Science",
-
-              //       color: Colors.blue,
-              //       onTap: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (_) => const QuizScreen('Science'),
-              //           ),
-              //         );
-              //       },
-              //       quizCount: '',
-              //     ),
-
-              //     buildCategoryCard(
-              //       icon: Icons.history_edu,
-              //       title: "Indian History",
-              //       color: Colors.orange,
-              //       onTap: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (_) => const QuizScreen("Indian History"),
-              //           ),
-              //         );
-              //       },
-              //       quizCount: '',
-              //     ),
-
-              //     buildCategoryCard(
-              //       icon: Icons.science,
-              //       title: "Physics",
-              //       color: Colors.purple,
-              //       onTap: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (_) => const QuizScreen("Physics"),
-              //           ),
-              //         );
-              //       },
-              //       quizCount: '',
-              //     ),
-
-              //     buildCategoryCard(
-              //       icon: Icons.science_outlined,
-              //       title: "Chemistry",
-              //       color: Colors.purple,
-              //       onTap: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (_) => const QuizScreen("Chemistry"),
-              //           ),
-              //         );
-              //       },
-              //       quizCount: '',
-              //     ),
-
-              //     buildCategoryCard(
-              //       icon: Icons.code,
-              //       title: "Programming",
-              //       color: Colors.purple,
-              //       onTap: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (_) => const QuizScreen("Programming"),
-              //           ),
-              //         );
-              //       },
-              //       quizCount: '',
-              //     ),
-
-              //     buildCategoryCard(
-              //       icon: Icons.memory,
-              //       title: "Computer",
-              //       color: Colors.purple,
-              //       onTap: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (_) => const QuizScreen("Computer"),
-              //           ),
-              //         );
-              //       },
-              //       quizCount: '',
-              //     ),
-
-              //     buildCategoryCard(
-              //       icon: Icons.palette,
-              //       title: "Art & Drawing",
-              //       color: Colors.red,
-              //       onTap: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (_) => const QuizScreen("Art & Drawing"),
-              //           ),
-              //         );
-              //       },
-              //       quizCount: '',
-              //     ),
-              //     buildCategoryCard(
-              //       icon: Icons.sports_esports,
-              //       title: "Sports",
-              //       color: Colors.green,
-              //       onTap: () {
-              //         Navigator.push(
-              //           context,
-              //           MaterialPageRoute(
-              //             builder: (_) => const QuizScreen("Sports"),
-              //           ),
-              //         );
-              //       },
-              //       quizCount: '',
-              //     ),
-              //   ],
-              // ),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -328,7 +232,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 1.1,
                 children: filteredCategories.map((category) {
                   return buildCategoryCard(
-                    
                     icon: category["icon"],
                     title: category["title"],
                     color: category["color"],
@@ -349,22 +252,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-
-      // /// Bottom Navigation
-      // bottomNavigationBar: BottomNavigationBar(
-      //   backgroundColor: const Color(0xFF0F172A),
-      //   selectedItemColor: Colors.blue,
-      //   unselectedItemColor: Colors.white54,
-      //   currentIndex: _selectedIndex,
-      //   onTap: _onItemTapped,
-      //   type: BottomNavigationBarType.fixed,
-      //   items: const [
-      //     BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home",),
-      //     BottomNavigationBarItem(icon: Icon(Icons.search),label: "Search",
-      //     ),
-      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-      //   ],
-      // ),
     );
   }
 }
