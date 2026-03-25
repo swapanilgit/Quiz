@@ -75,6 +75,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardAspectRatio = screenWidth < 360 ? 0.88 : 0.98;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       body: SafeArea(
@@ -232,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
-                childAspectRatio: 1.1,
+                childAspectRatio: cardAspectRatio,
                 children: filteredCategories.map((category) {
                   return buildCategoryCard(
                     icon: category["icon"],

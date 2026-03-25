@@ -32,7 +32,6 @@ class buildCategoryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -41,25 +40,36 @@ class buildCategoryCard extends StatelessWidget {
               ),
               child: Icon(icon, color: color, size: 30),
             ),
-
-            const Spacer(),
-
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 6),
-
-            Text(
-              quizCount,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w600,
+            const SizedBox(height: 12),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      height: 1.15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (quizCount.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      quizCount,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: color,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],

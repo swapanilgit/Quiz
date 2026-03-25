@@ -1119,6 +1119,7 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               backgroundColor: isSelected ? Colors.blue : Colors.white12,
@@ -1128,12 +1129,32 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
             const SizedBox(width: 15),
-            Text(
-              questions[currentIndex].options[index],
-              style: const TextStyle(color: Colors.white, fontSize: 18),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  questions[currentIndex].options[index],
+                  maxLines: 4,
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
             ),
-            const Spacer(),
-            if (isSelected) const Icon(Icons.check_circle, color: Colors.blue),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: 20,
+              child: isSelected
+                  ? const Padding(
+                      padding: EdgeInsets.only(top: 4),
+                      child: Icon(
+                        Icons.check_circle,
+                        color: Colors.blue,
+                        size: 20,
+                      ),
+                    )
+                  : null,
+            ),
           ],
         ),
       ),
