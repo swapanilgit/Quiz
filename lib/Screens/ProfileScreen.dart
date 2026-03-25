@@ -342,8 +342,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               await prefs.remove('quiz_history');
 
               setState(() {
-                _name = 'Swapanil Gupta';
-                _email = 'swapanil.gupta@example.com';
+                _name = 'Enter Name';
+                _email = 'email@example.com';
                 _profileImage = null;
               });
 
@@ -500,27 +500,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: 'Saved Quizzes',
                       onTap: () => _push(const SavedQuizzesPage()),
                     ),
-                    _menuItem(
-                      icon: Icons.notifications_outlined,
-                      label: 'Notifications',
-                      badge: _hasNotification,
-                      onTap: () {
-                        setState(() => _hasNotification = false);
-                        _push(const NotificationsPage());
-                      },
-                    ),
+                    // _menuItem(
+                    //   icon: Icons.notifications_outlined,
+                    //   label: 'Notifications',
+                    //   badge: _hasNotification,
+                    //   onTap: () {
+                    //     setState(() => _hasNotification = false);
+                    //     _push(const NotificationsPage());
+                    //   },
+                    // ),
                     Divider(
                       height: 24,
                       thickness: 0.5,
                       color: AppColors.border,
                     ),
-                    _menuItem(
-                      icon: Icons.settings_outlined,
-                      label: 'Settings',
-                      iconColor: AppColors.subtext,
-                      iconBg: AppColors.card,
-                      onTap: _openSettings,
-                    ),
+                    // _menuItem(
+                    //   icon: Icons.settings_outlined,
+                    //   label: 'Settings',
+                    //   iconColor: AppColors.subtext,
+                    //   iconBg: AppColors.card,
+                    //   onTap: _openSettings,
+                    // ),
                     _menuItem(
                       icon: Icons.help_outline,
                       label: 'Help & Support',
