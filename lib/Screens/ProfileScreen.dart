@@ -138,7 +138,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String _name = 'Enter Name';
   String _email = 'example@gmail.com';
-  bool _hasNotification = true;
+  // bool _hasNotification = true;
   int _totalAttempts = 0;
   int _totalScore = 0;
   int _rank = 1;
@@ -282,6 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   void _openSettings() {
     bool pushNotif = true;
     bool darkMode = true;
