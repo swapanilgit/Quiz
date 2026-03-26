@@ -21,41 +21,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Map<String, dynamic>> allCategories = [
     {"title": "Science", "icon": Icons.science, "color": Colors.blue},
-    {
-      "title": "Indian History",
-      "icon": Icons.history_edu,
-      "color": Colors.orange,
-    },
+    {"title": "Indian History","icon": Icons.history_edu,"color": Colors.orange,},
     {"title": "Physics", "icon": Icons.science, "color": Colors.purple},
-    {
-      "title": "Chemistry",
-      "icon": Icons.science_outlined,
-      "color": Colors.purple,
-    },
+    {"title": "Chemistry","icon": Icons.science_outlined,"color": Colors.purple,},
+    {"title": "General Knowledge", "icon": Icons.question_answer, "color": Colors.grey},
     {"title": "Programming", "icon": Icons.code, "color": Colors.purple},
     {"title": "Computer", "icon": Icons.memory, "color": Colors.purple},
     {"title": "Art & Drawing", "icon": Icons.palette, "color": Colors.red},
     {"title": "Sports", "icon": Icons.sports_esports, "color": Colors.green},
+    {"title": "English ","icon": Icons.book,"color":Colors.white}
   ];
 
   List<Map<String, dynamic>> filteredCategories = [];
 
-  // int _selectedIndex = 0;
-
-  // final List<String> bottomLabels = ["Home", "Search", "Profile"];
-
-  // void _onItemTapped(int index) {
-  //   setState(() {
-  //     _selectedIndex = index;
-  //   });
-
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content: Text("${bottomLabels[index]} Clicked"),
-  //       duration: const Duration(milliseconds: 500),
-  //     ),
-  //   );
-  // }
 
   void searchCategory(String query) {
     final results = allCategories.where((category) {
@@ -89,9 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
 
               /// Top Welcome Text
-              const Text(
-                "Welcome back, Alex!",
-                style: TextStyle(color: Colors.white70, fontSize: 16),
+              Text(
+                "Welcome back!",
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
               ),
 
               const SizedBox(height: 8),

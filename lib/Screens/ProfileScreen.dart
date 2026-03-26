@@ -1,8 +1,12 @@
+
+// ignore_for_file: unused_import
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quiz/Screens/HomeScreen.dart';
+import 'package:quiz/Screens/Login_Screen.dart';
 import 'package:quiz/Screens/QuizHistoryPage.dart';
 import 'package:quiz/Screens/QuizScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
@@ -149,29 +153,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _loadUserData();
     _loadStats();
-    _loadHistoryStats();
-  }
-
-  Future<void> _loadHistoryStats() async {
-    final history = await UserCache.loadQuizHistory();
-
-    int totalScore = 0;
-
-    for (var item in history) {
-      totalScore += item['correctAnswers'] as int;
-    }
-
-    setState(() {
-      _totalScore = totalScore;
-
-      if (totalScore > 100) {
-        _rank = 1;
-      } else if (totalScore > 50) {
-        _rank = 5;
-      } else {
-        _rank = 20;
-      }
-    });
   }
 
   Future<void> _loadStats() async {
@@ -179,6 +160,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     setState(() {
       _totalAttempts = stats.totalAttempts;
+      _totalScore = stats.totalScore;
+
+      if (_totalScore > 100) {
+        _rank = 1;
+      } else if (_totalScore > 50) {
+        _rank = 5;
+      } else {
+        _rank = 20;
+      }
     });
   }
 
@@ -271,7 +261,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (newEmail.isNotEmpty) _email = newEmail;
               });
 
-              // 🔥 SAVE TO LOCAL STORAGE
               await UserCache.updateProfile(name: newName, email: newEmail);
               Navigator.pop(ctx);
               _toast('Profile updated');
@@ -337,18 +326,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'Logout',
             onTap: () async {
               Navigator.pop(ctx);
-              await UserCache.clearAll();
+              await UserCache.logoutUser();
 
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('quiz_history');
+              if (!mounted) return;
 
-              setState(() {
-                _name = 'Enter Name';
-                _email = 'email@example.com';
-                _profileImage = null;
-              });
-
-              _toast('Logged out successfully');
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false,
+              );
             },
             color: AppColors.red,
           ),
@@ -472,7 +458,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           thickness: 0.5,
                           color: AppColors.border,
                         ),
-                        _statItem('#$_rank', 'GLOBAL\nRANK',right: true),
+                        _statItem('#$_rank', 'GLOBAL\nRANK', right: true),
                       ],
                     ),
                   ),
@@ -819,8 +805,6 @@ PreferredSizeWidget _darkAppBar(BuildContext context, String title) => AppBar(
     child: Container(height: 0.5, color: AppColors.border),
   ),
 );
-
-
 
 // ── Saved Quizzes ─────────────────────────────────────────────────────────────
 class SavedQuizzesPage extends StatefulWidget {

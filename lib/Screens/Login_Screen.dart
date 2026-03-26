@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quiz/Screens/ProfileScreen.dart';
+import 'package:quiz/Screens/UserCache.dart';
 import 'SignUpScreen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -9,7 +11,53 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool isPasswordHidden = true;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      _toast("Please enter both email and password");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final success = await UserCache.loginUser(
+      email: email,
+      password: password,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (!success) {
+      _toast("Invalid email or password");
+      return;
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const MainScreen()),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +139,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: const Color(0xFF1E293B),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const TextField(
+                    child: TextField(
+                      controller: _emailController,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: "name@example.com",
@@ -127,6 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: TextField(
+                      controller: _passwordController,
                       obscureText: isPasswordHidden,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
@@ -184,14 +234,23 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      onPressed: () {},
-                      child: const Text(
-                        "Login",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      onPressed: _isLoading ? null : _login,
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              "Login",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
 
@@ -293,6 +352,21 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           elevation: 2,
         ),
+      ),
+    );
+  }
+  
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: const TextStyle(color: AppColors.text)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppColors.border),
+        ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

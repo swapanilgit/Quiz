@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:quiz/Screens/Login_Screen.dart';
 import 'package:quiz/Screens/ProfileScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await UserCache.init();
-  runApp(const MyApp());
+  final loggedIn = await UserCache.isLoggedIn();
+  runApp(MyApp(isLoggedIn: loggedIn));
 }
 
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.isLoggedIn = false});
+
+  final bool isLoggedIn;
 
   // This widget is the root of your application.
   @override
@@ -18,7 +23,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Brain Byte',
       theme: ThemeData.dark(),
-      home: MainScreen(),
+      home: isLoggedIn ? MainScreen() : const LoginScreen(),
     );
   }
 }

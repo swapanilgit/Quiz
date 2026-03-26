@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:quiz/Screens/ProfileScreen.dart';
+import 'package:quiz/Screens/UserCache.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -8,7 +10,6 @@ class CreateAccountScreen extends StatefulWidget {
 }
 
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
-
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController nameController = TextEditingController();
@@ -17,20 +18,54 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   bool isPasswordHidden = true;
   bool isChecked = false;
+  bool _isLoading = false;
 
-  void createAccount() {
-    if (_formKey.currentState!.validate()) {
-      if (!isChecked) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please accept Terms & Conditions")),
-        );
-        return;
-      }
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
+  Future<void> createAccount() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (!isChecked) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Account Created Successfully")),
+        const SnackBar(content: Text("Please accept Terms & Conditions")),
       );
+      return;
     }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final success = await UserCache.registerUser(
+      name: nameController.text.trim(),
+      email: emailController.text.trim(),
+      password: passwordController.text,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (!success) {
+      _toast("Account already exists for this email");
+      return;
+    }
+    _toast("Account Created Successfully");
+
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const MainScreen()),
+      (route) => false,
+    );
   }
 
   @override
@@ -45,7 +80,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 const SizedBox(height: 20),
 
                 /// Back Button
@@ -53,8 +87,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  icon: const Icon(Icons.arrow_back_ios,
-                      color: Colors.white),
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                 ),
 
                 const SizedBox(height: 10),
@@ -73,10 +106,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                 const Text(
                   "Join thousands of learners and start your quiz journey today.",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
                 ),
 
                 const SizedBox(height: 30),
@@ -156,16 +186,18 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           children: [
                             TextSpan(text: "I agree to the "),
                             TextSpan(
-                                text: "Terms of Service",
-                                style: TextStyle(color: Colors.blue)),
+                              text: "Terms of Service",
+                              style: TextStyle(color: Colors.blue),
+                            ),
                             TextSpan(text: " and "),
                             TextSpan(
-                                text: "Privacy Policy",
-                                style: TextStyle(color: Colors.blue)),
+                              text: "Privacy Policy",
+                              style: TextStyle(color: Colors.blue),
+                            ),
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
 
@@ -176,17 +208,26 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: createAccount,
+                    onPressed: _isLoading ? null : createAccount,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
-                      "Create Account",
-                      style: TextStyle(fontSize: 18),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Create Account",
+                            style: TextStyle(fontSize: 18),
+                          ),
                   ),
                 ),
 
@@ -198,8 +239,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     Expanded(child: Divider(color: Colors.white24)),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text("OR SIGN UP WITH",
-                          style: TextStyle(color: Colors.white54)),
+                      child: Text(
+                        "OR SIGN UP WITH",
+                        style: TextStyle(color: Colors.white54),
+                      ),
                     ),
                     Expanded(child: Divider(color: Colors.white24)),
                   ],
@@ -215,10 +258,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         icon: Icons.g_mobiledata,
                         text: "Google",
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Google Sign Up Clicked")),
-                          );
+                          _toast('Google Sing Up Clicked');
+                          
                         },
                       ),
                     ),
@@ -228,10 +269,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         icon: Icons.apple,
                         text: "Apple",
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Apple Sign Up Clicked")),
-                          );
+                          _toast('Apple Sign Up Clicked');
                         },
                       ),
                     ),
@@ -242,27 +280,25 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                 /// Login
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Already have an account?",
-                        style: TextStyle(
-                          fontSize: 14
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account?",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(fontSize: 14, color: Colors.blue),
                         ),
                       ),
-                      Center(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            "Login",
-                            style: TextStyle(fontSize: 14,color: Colors.blue),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 20),
               ],
             ),
@@ -333,10 +369,27 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           children: [
             Icon(icon, color: Colors.white),
             const SizedBox(width: 8),
-            Text(text,
-                style: const TextStyle(color: Colors.white, fontSize: 16)),
+            Text(
+              text,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
           ],
         ),
+      ),
+    );
+  }
+  
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: const TextStyle(color: AppColors.text)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppColors.border),
+        ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

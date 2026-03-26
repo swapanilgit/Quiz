@@ -87,24 +87,55 @@ class CategoryStat {
 
 class UserStats {
   final int totalAttempts;
+  final int totalScore;
   final Map<String, CategoryStat> categories; // key = category name
 
-  const UserStats({required this.totalAttempts, required this.categories});
+  const UserStats({
+    required this.totalAttempts,
+    required this.totalScore,
+    required this.categories,
+  });
 
   Map<String, dynamic> toJson() => {
     'totalAttempts': totalAttempts,
+    'totalScore': totalScore,
     'categories': categories.map((k, v) => MapEntry(k, v.toJson())),
   };
 
   factory UserStats.fromJson(Map<String, dynamic> json) => UserStats(
     totalAttempts: json['totalAttempts'] ?? 0,
+    totalScore: json['totalScore'] ?? 0,
     categories: (json['categories'] as Map<String, dynamic>? ?? {}).map(
       (k, v) => MapEntry(k, CategoryStat.fromJson(v as Map<String, dynamic>)),
     ),
   );
 
   factory UserStats.empty() =>
-      const UserStats(totalAttempts: 0, categories: {});
+      const UserStats(totalAttempts: 0, totalScore: 0, categories: {});
+}
+
+class LocalAuthUser {
+  final String name;
+  final String email;
+  final String password;
+
+  const LocalAuthUser({
+    required this.name,
+    required this.email,
+    required this.password,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'email': email,
+    'password': password,
+  };
+
+  factory LocalAuthUser.fromJson(Map<String, dynamic> json) => LocalAuthUser(
+    name: json['name'] ?? '',
+    email: json['email'] ?? '',
+    password: json['password'] ?? '',
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -116,6 +147,8 @@ class _Keys {
   static const stats = 'user_stats';
   static const history = 'quiz_history';
   static const savedQuizzes = 'saved_quizzes';
+  static const authUser = 'auth_user';
+  static const isLoggedIn = 'is_logged_in';
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -164,6 +197,11 @@ class UserCache {
     }
   }
 
+  static Future<void> clearQuizHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_Keys.history);
+  }
+
   static Future<void> saveAnswers({
     required String category,
     required List<Map<String, dynamic>> answersList,
@@ -193,6 +231,84 @@ class UserCache {
     if (!data.containsKey(category)) return [];
 
     return List<Map<String, dynamic>>.from(data[category]);
+  }
+
+  static Future<void> saveAuthUser({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final authUser = LocalAuthUser(
+      name: name,
+      email: email.trim(),
+      password: password,
+    );
+    await prefs.setString(_Keys.authUser, jsonEncode(authUser.toJson()));
+  }
+
+  static Future<LocalAuthUser?> loadAuthUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_Keys.authUser);
+    if (raw == null) return null;
+
+    try {
+      return LocalAuthUser.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('[UserCache] Failed to parse auth user: $e');
+      return null;
+    }
+  }
+
+  static Future<bool> registerUser({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final existingUser = await loadAuthUser();
+    final normalizedEmail = email.trim().toLowerCase();
+
+    if (existingUser != null &&
+        existingUser.email.trim().toLowerCase() == normalizedEmail) {
+      return false;
+    }
+
+    await saveAuthUser(name: name, email: normalizedEmail, password: password);
+    await saveProfile(name: name, email: normalizedEmail);
+    await setLoggedIn(true);
+    return true;
+  }
+
+  static Future<bool> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    final savedUser = await loadAuthUser();
+    if (savedUser == null) return false;
+
+    final matches =
+        savedUser.email.trim().toLowerCase() == email.trim().toLowerCase() &&
+        savedUser.password == password;
+
+    if (!matches) return false;
+
+    await updateProfile(name: savedUser.name, email: savedUser.email);
+    await setLoggedIn(true);
+    return true;
+  }
+
+  static Future<void> setLoggedIn(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_Keys.isLoggedIn, value);
+  }
+
+  static Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_Keys.isLoggedIn) ?? false;
+  }
+
+  static Future<void> logoutUser() async {
+    await setLoggedIn(false);
   }
 
   static Future<void> saveQuiz({
@@ -288,11 +404,25 @@ class UserCache {
   }) async {
     final current =
         await loadProfile() ?? const UserProfile(name: '', email: '');
+    final authUser = await loadAuthUser();
+
+    final updatedName = name ?? current.name;
+    final updatedEmail = email ?? current.email;
+    final updatedPhotoUrl = photoUrl ?? current.photoUrl;
+
     await saveProfile(
-      name: name ?? current.name,
-      email: email ?? current.email,
-      photoUrl: photoUrl ?? current.photoUrl,
+      name: updatedName,
+      email: updatedEmail,
+      photoUrl: updatedPhotoUrl,
     );
+
+    if (authUser != null) {
+      await saveAuthUser(
+        name: updatedName,
+        email: updatedEmail,
+        password: authUser.password,
+      );
+    }
   }
 
   // ── Stats ─────────────────────────────────────────────────
@@ -327,6 +457,7 @@ class UserCache {
 
     final updated = UserStats(
       totalAttempts: stats.totalAttempts + 1,
+      totalScore: stats.totalScore + score,
       categories: updatedCategories,
     );
 
@@ -368,6 +499,8 @@ class UserCache {
     await prefs.remove(_Keys.profile);
     await prefs.remove(_Keys.stats);
     await prefs.remove(_Keys.savedQuizzes);
+    await prefs.remove(_Keys.authUser);
+    await prefs.remove(_Keys.isLoggedIn);
     debugPrint('[UserCache] All data cleared.');
   }
 

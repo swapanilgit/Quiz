@@ -98,6 +98,47 @@ class _QuizHistoryPageState extends State<QuizHistoryPage> {
     });
   }
 
+  Future<void> _deleteQuizHistory() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text(
+          'Delete Quiz History',
+          style: TextStyle(color: AppColors.text),
+        ),
+        content: const Text(
+          'Are you sure you want to delete all quiz history?',
+          style: TextStyle(color: AppColors.subtext),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: AppColors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return;
+
+    await UserCache.clearQuizHistory();
+
+    if (!mounted) return;
+
+    _refresh();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Quiz history deleted')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,6 +177,11 @@ class _QuizHistoryPageState extends State<QuizHistoryPage> {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _deleteQuizHistory,
+        backgroundColor: AppColors.red,
+        child: const Icon(Icons.delete_outline, color: Colors.white),
       ),
     );
   }

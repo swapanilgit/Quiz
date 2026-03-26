@@ -10,7 +10,6 @@ class Question {
   final String question;
   final List<String> options;
   final int correctIndex;
-
   final String title;
 
   Question({
@@ -20,19 +19,6 @@ class Question {
     required this.correctIndex,
   });
 }
-
-// class AnsweredQuestion {
-//   final String question;
-//   final String correctAnswer;
-//   final String userAnswer;
-
-//   AnsweredQuestion({
-//     required this.question,
-//     required this.correctAnswer,
-//     required this.userAnswer,
-//   });
-
-// }
 
 class QuizScreen extends StatefulWidget {
   final String title;
@@ -138,6 +124,68 @@ class _QuizScreenState extends State<QuizScreen> {
         question: "How many bones are there in an adult human body?",
         options: ["206", "150", "300", "180"],
         correctIndex: 0,
+      ),
+    ],
+    "English": [
+      Question(
+        title: "English",
+        question: "Which of these is a 'vowel'?",
+        options: ["B", "M", "E", "Y"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "English",
+        question: "What is the plural of 'Child'?",
+        options: ["Childs", "Children", "Childrens", "Childes"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "English",
+        question: "Identify the 'Verb' in: 'The cat runs fast.'",
+        options: ["Cat", "Runs", "Fast", "The"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "English",
+        question: "Which word is an 'Antonym' (opposite) of 'Hot'?",
+        options: ["Warm", "Cold", "Boiling", "Sun"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "English",
+        question: "Fill in the blank: 'I ___ going to the market.'",
+        options: ["is", "am", "are", "be"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "English",
+        question: "Which of these is spelled correctly?",
+        options: ["Recieve", "Receive", "Receve", "Riceive"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "English",
+        question: "What is a person who writes books called?",
+        options: ["Actor", "Doctor", "Author", "Baker"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "English",
+        question: "Choose the correct article: 'She ate ___ apple.'",
+        options: ["a", "an", "the", "no article"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "English",
+        question: "Which word is a 'Noun'?",
+        options: ["Beautiful", "Quickly", "London", "Slept"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "English",
+        question: "What is the past tense of 'Eat'?",
+        options: ["Eaten", "Eated", "Ate", "Eating"],
+        correctIndex: 2,
       ),
     ],
 
@@ -705,6 +753,84 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: 1,
       ),
     ],
+    "General Knowledge": [
+      Question(
+        title: "Indian General Knowledge",
+        question: "Who is known as the 'Iron Man of India'?",
+        options: [
+          "Sardar Vallabhbhai Patel",
+          "Jawaharlal Nehru",
+          "Mahatma Gandhi",
+          "Subhas Chandra Bose",
+        ],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question: "Which Indian state has the longest coastline?",
+        options: ["Maharashtra", "Tamil Nadu", "Gujarat", "Andhra Pradesh"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question: "What is the national heritage animal of India?",
+        options: ["Tiger", "Elephant", "Lion", "Rhicoceros"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question: "In which year did India win its first Cricket World Cup?",
+        options: ["1975", "1987", "1983", "2011"],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question: "Which city is known as the 'Silicon Valley of India'?",
+        options: ["Hyderabad", "Pune", "Mumbai", "Bengaluru"],
+        correctIndex: 3,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question: "Who was the first woman Prime Minister of India?",
+        options: [
+          "Pratibha Patil",
+          "Indira Gandhi",
+          "Sarojini Naidu",
+          "Sushma Swaraj",
+        ],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question:
+            "The classical dance form 'Kathakali' originated in which state?",
+        options: ["Kerala", "Karnataka", "Tamil Nadu", "Odisha"],
+        correctIndex: 0,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question: "Which is the highest civilian award in India?",
+        options: [
+          "Padma Vibhushan",
+          "Param Vir Chakra",
+          "Bharat Ratna",
+          "Sahitya Akademi Award",
+        ],
+        correctIndex: 2,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question: "Which planet is known as the 'Red Planet'?",
+        options: ["Venus", "Mars", "Saturn", "Jupiter"],
+        correctIndex: 1,
+      ),
+      Question(
+        title: "Indian General Knowledge",
+        question: "The 'Hawa Mahal' is located in which Indian city?",
+        options: ["Jodhpur", "Udaipur", "Jaipur", "Bikaner"],
+        correctIndex: 2,
+      ),
+    ],
   };
 
   @override
@@ -713,8 +839,9 @@ class _QuizScreenState extends State<QuizScreen> {
 
     if (widget.useRandomSelection) {
       final random = Random();
-      final mixedQuestions = allQuestions.values.expand((items) => items).toList()
-        ..shuffle(random);
+      final mixedQuestions =
+          allQuestions.values.expand((items) => items).toList()
+            ..shuffle(random);
       final count = mixedQuestions.length < widget.randomQuestionCount
           ? mixedQuestions.length
           : widget.randomQuestionCount;
@@ -854,12 +981,10 @@ class _QuizScreenState extends State<QuizScreen> {
 
   Future<void> saveCurrentQuiz() async {
     if (_isQuizSaved) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Quiz already saved")));
-      return;
+      _toast("Quiz already saved");
+    } else {
+      _toast('Quiz saved successfully');
     }
-
     await UserCache.saveQuiz(
       title: widget.title,
       useRandomSelection: widget.useRandomSelection,
@@ -871,10 +996,6 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       _isQuizSaved = true;
     });
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Quiz saved successfully")));
   }
 
   void submitAnswer() {
@@ -1157,6 +1278,21 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: const TextStyle(color: AppColors.text)),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppColors.border),
+        ),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
