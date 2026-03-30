@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:quiz/Screens/Login_Screen.dart';
 import 'package:quiz/Screens/ProfileScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
@@ -6,7 +8,16 @@ import 'package:quiz/Screens/UserCache.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await UserCache.init();
-  final loggedIn = await UserCache.isLoggedIn();
+  var loggedIn = await UserCache.isLoggedIn();
+
+  try {
+    await Firebase.initializeApp();
+    loggedIn = FirebaseAuth.instance.currentUser != null || loggedIn;
+  } catch (_) {
+    // Keep the app running so local features still work if Firebase files
+    // have not been added yet.
+  }
+
   runApp(MyApp(isLoggedIn: loggedIn));
 }
 

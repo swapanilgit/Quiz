@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quiz/Screens/HomeScreen.dart';
 import 'package:quiz/Screens/Login_Screen.dart';
@@ -326,6 +327,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'Logout',
             onTap: () async {
               Navigator.pop(ctx);
+              try {
+                await FirebaseAuth.instance.signOut();
+              } catch (_) {}
               await UserCache.logoutUser();
 
               if (!mounted) return;

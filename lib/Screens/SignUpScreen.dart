@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:quiz/Screens/ProfileScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
 
@@ -42,11 +43,37 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       _isLoading = true;
     });
 
-    final success = await UserCache.registerUser(
-      name: nameController.text.trim(),
-      email: emailController.text.trim(),
-      password: passwordController.text,
-    );
+    var success = false;
+
+    try {
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text,
+          );
+
+      await credential.user?.updateDisplayName(nameController.text.trim());
+      await credential.user?.reload();
+
+      await UserCache.updateProfile(
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
+      );
+      await UserCache.setLoggedIn(true);
+      success = true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        _toast("Account already exists for this email");
+      } else if (e.code == 'weak-password') {
+        _toast("Password is too weak");
+      } else if (e.code == 'invalid-email') {
+        _toast("Enter a valid email");
+      } else {
+        _toast(e.message ?? "Account creation failed");
+      }
+    } catch (_) {
+      _toast("Firebase is not configured correctly");
+    }
 
     if (!mounted) return;
 
@@ -55,7 +82,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     });
 
     if (!success) {
-      _toast("Account already exists for this email");
       return;
     }
     _toast("Account Created Successfully");
@@ -116,7 +142,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 const SizedBox(height: 8),
                 buildTextField(
                   controller: nameController,
-                  hint: "John Doe",
+                  hint: "D Gukesh",
                   icon: Icons.person,
                   validator: (value) =>
                       value!.isEmpty ? "Enter your name" : null,
@@ -129,7 +155,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 const SizedBox(height: 8),
                 buildTextField(
                   controller: emailController,
-                  hint: "hello@example.com",
+                  hint: "Please Enter Valid Email id",
                   icon: Icons.email,
                   validator: (value) {
                     if (value!.isEmpty) return "Enter email";
@@ -208,7 +234,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : createAccount,
+                    onPressed: (_isLoading || !isChecked)
+                        ? null
+                        : createAccount,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(

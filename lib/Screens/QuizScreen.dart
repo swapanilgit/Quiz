@@ -884,7 +884,7 @@ class _QuizScreenState extends State<QuizScreen> {
   void restartTimer() {
     timer?.cancel();
     isTimeUp = false;
-    seconds = 15;
+    seconds = 20;
     _isShowingResult = false;
 
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -968,15 +968,6 @@ class _QuizScreenState extends State<QuizScreen> {
         ],
       ),
     );
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => ReviewScreen(
-    //       category: widget.title,
-    //       answered: answered, // ✅ PASS REAL DATA
-    //     ),
-    //   ),
-    // );
   }
 
   Future<void> saveCurrentQuiz() async {

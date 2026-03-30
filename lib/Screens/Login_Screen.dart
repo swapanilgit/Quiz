@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quiz/Screens/Forgot.dart';
 import 'package:quiz/Screens/ProfileScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
 import 'SignUpScreen.dart';
@@ -36,10 +38,37 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    final success = await UserCache.loginUser(
-      email: email,
-      password: password,
-    );
+    var success = false;
+
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final user = credential.user;
+      if (user != null) {
+        await UserCache.updateProfile(
+          name: (user.displayName?.trim().isNotEmpty ?? false)
+              ? user.displayName!.trim()
+              : email.split('@').first,
+          email: user.email ?? email,
+        );
+        await UserCache.setLoggedIn(true);
+        success = true;
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-credential' ||
+          e.code == 'user-not-found' ||
+          e.code == 'wrong-password' ||
+          e.code == 'invalid-email') {
+        _toast("Invalid email or password");
+      } else {
+        _toast(e.message ?? "Login failed");
+      }
+    } catch (_) {
+      _toast("Firebase is not configured correctly");
+    }
 
     if (!mounted) return;
 
@@ -48,7 +77,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (!success) {
-      _toast("Invalid email or password");
       return;
     }
 
@@ -213,7 +241,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: (() => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const Forgot()),
+                          )),
                       child: const Text(
                         "Forgot Password?",
                         style: TextStyle(color: Colors.blue),
