@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quiz/Screens/HomeScreen.dart';
 import 'package:quiz/Screens/Login_Screen.dart';
+import 'package:quiz/Screens/OnlineQuizMakerScreen.dart';
 import 'package:quiz/Screens/QuizHistoryPage.dart';
 import 'package:quiz/Screens/QuizScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
@@ -75,48 +76,95 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  DateTime? _lastBackPressedAt;
 
   final List<Widget> _pages = const [
     HomeScreen(),
     QuizHistoryPage(),
+    OnlineQuizMakerScreen(),
     ProfileScreen(),
   ];
 
+  Future<bool> _handleBackPress() async {
+    if (_selectedIndex != 0) {
+      setState(() {
+        _selectedIndex = 0;
+      });
+      return false;
+    }
+
+    final now = DateTime.now();
+    if (_lastBackPressedAt != null &&
+        now.difference(_lastBackPressedAt!) <= const Duration(seconds: 2)) {
+      return true;
+    }
+
+    _lastBackPressedAt = now;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Press back again to close the app',
+          style: TextStyle(color: AppColors.text),
+        ),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppColors.border),
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          border: Border(top: BorderSide(color: AppColors.border, width: 0.5)),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          backgroundColor: AppColors.surface,
-          selectedItemColor: AppColors.indigo,
-          unselectedItemColor: AppColors.subtext,
-          selectedLabelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
+    return WillPopScope(
+      onWillPop: _handleBackPress,
+      child: Scaffold(
+        body: _pages[_selectedIndex],
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            border: Border(
+              top: BorderSide(color: AppColors.border, width: 0.5),
+            ),
           ),
-          unselectedLabelStyle: const TextStyle(fontSize: 11),
-          elevation: 0,
-          onTap: (i) => setState(() => _selectedIndex = i),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: 'Home',
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.shifting,
+            currentIndex: _selectedIndex,
+            backgroundColor: AppColors.surface,
+            selectedItemColor: AppColors.indigo,
+            unselectedItemColor: AppColors.subtext,
+            showSelectedLabels: true,
+            showUnselectedLabels: true,
+            selectedLabelStyle: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history_toggle_off_rounded),
-              label: 'History',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              label: 'Profile',
-            ),
-          ],
+            unselectedLabelStyle: const TextStyle(fontSize: 11),
+            elevation: 0,
+            onTap: (i) => setState(() => _selectedIndex = i),
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.history_toggle_off_rounded),
+                label: 'History',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.door_back_door),
+                label: 'Room',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                label: 'Profile',
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -141,13 +189,13 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String _name = 'Enter Name';
-  String _email = 'example@gmail.com';
+  String _name = 'Guest User';
+  String _email = 'No email available';
   // bool _hasNotification = true;
   int _totalAttempts = 0;
   int _totalScore = 0;
   int _rank = 1;
-  File? _profileImage;
+  String? _profilePhotoUrl;
 
   @override
   void initState() {
@@ -174,18 +222,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    final profile = await UserCache.loadProfile();
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final cachedProfile = await UserCache.loadCachedProfile();
+    final resolvedName =
+        (firebaseUser?.displayName?.trim().isNotEmpty ?? false)
+        ? firebaseUser!.displayName!.trim()
+        : (cachedProfile?.name.trim().isNotEmpty ?? false)
+        ? cachedProfile!.name.trim()
+        : 'Guest User';
+    final resolvedEmail =
+        (firebaseUser?.email?.trim().isNotEmpty ?? false)
+        ? firebaseUser!.email!.trim()
+        : (cachedProfile?.email.trim().isNotEmpty ?? false)
+        ? cachedProfile!.email.trim()
+        : 'No email available';
+    final resolvedPhotoUrl =
+        (cachedProfile?.photoUrl.trim().isNotEmpty ?? false)
+        ? cachedProfile!.photoUrl.trim()
+        : (firebaseUser?.photoURL?.trim().isNotEmpty ?? false)
+        ? firebaseUser!.photoURL!.trim()
+        : '';
 
-    if (profile != null) {
-      setState(() {
-        _name = profile.name;
-        _email = profile.email;
+    if (!mounted) return;
 
-        if (profile.photoUrl.isNotEmpty) {
-          _profileImage = File(profile.photoUrl);
-        }
-      });
-    }
+    setState(() {
+      _name = resolvedName;
+      _email = resolvedEmail;
+      _profilePhotoUrl = resolvedPhotoUrl.isNotEmpty ? resolvedPhotoUrl : null;
+    });
+
+    final cloudProfile = await UserCache.refreshProfileFromCloud();
+    if (!mounted || cloudProfile == null) return;
+
+    final refreshedName =
+        (firebaseUser?.displayName?.trim().isNotEmpty ?? false)
+        ? firebaseUser!.displayName!.trim()
+        : (cloudProfile.name.trim().isNotEmpty
+              ? cloudProfile.name.trim()
+              : 'Guest User');
+    final refreshedEmail =
+        (firebaseUser?.email?.trim().isNotEmpty ?? false)
+        ? firebaseUser!.email!.trim()
+        : (cloudProfile.email.trim().isNotEmpty
+              ? cloudProfile.email.trim()
+              : 'No email available');
+    final refreshedPhotoUrl =
+        cloudProfile.photoUrl.trim().isNotEmpty
+        ? cloudProfile.photoUrl.trim()
+        : (firebaseUser?.photoURL?.trim().isNotEmpty ?? false)
+        ? firebaseUser!.photoURL!.trim()
+        : '';
+
+    setState(() {
+      _name = refreshedName;
+      _email = refreshedEmail;
+      _profilePhotoUrl = refreshedPhotoUrl.isNotEmpty
+          ? refreshedPhotoUrl
+          : null;
+    });
   }
 
   Future<void> _pickProfileImage() async {
@@ -193,23 +287,131 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final XFile? image = await picker.pickImage(
       source: ImageSource.gallery, // you can change to camera
-      imageQuality: 80,
     );
 
     if (image != null) {
       final file = File(image.path);
+      final uploadedPhotoUrl = await UserCache.uploadProfilePhoto(file.path);
 
       setState(() {
-        _profileImage = file;
+        _profilePhotoUrl = uploadedPhotoUrl ?? file.path;
       });
 
-      // 🔥 Save image path locally
-      await UserCache.updateProfile(photoUrl: file.path);
+      await UserCache.updateProfile(photoUrl: uploadedPhotoUrl ?? file.path);
     }
+  }
+
+  Future<void> _removeProfileImage() async {
+    setState(() {
+      _profilePhotoUrl = null;
+    });
+
+    await UserCache.updateProfile(photoUrl: '');
+  }
+
+  void _viewProfileImage() {
+    if (_profilePhotoUrl == null || _profilePhotoUrl!.trim().isEmpty) {
+      _toast('No profile picture available');
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: _profilePhotoUrl!.startsWith('http')
+                    ? Image.network(_profilePhotoUrl!, fit: BoxFit.cover)
+                    : Image.file(File(_profilePhotoUrl!), fit: BoxFit.cover),
+              ),
+            ),
+            Positioned(
+              top: 6,
+              right: 6,
+              child: IconButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.black45,
+                ),
+                icon: const Icon(Icons.close, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openProfileImageActions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _imageActionTile(
+                icon: Icons.visibility_outlined,
+                label: 'View',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _viewProfileImage();
+                },
+              ),
+              _imageActionTile(
+                icon: Icons.photo_camera_back_outlined,
+                label: 'Change',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickProfileImage();
+                },
+              ),
+              _imageActionTile(
+                icon: Icons.delete_outline,
+                label: 'Delete',
+                color: AppColors.red,
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await _removeProfileImage();
+                  _toast('Profile picture removed');
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   String get _initials {
     final parts = _name.trim().split(' ');
+    if (parts.isEmpty || parts.first.isEmpty) return 'G';
     return parts.length >= 2
         ? '${parts[0][0]}${parts[1][0]}'.toUpperCase()
         : parts[0][0].toUpperCase();
@@ -377,8 +579,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                     child: ClipOval(
-                      child: _profileImage != null
-                          ? Image.file(_profileImage!, fit: BoxFit.cover)
+                      child: _profilePhotoUrl != null
+                          ? (_profilePhotoUrl!.startsWith('http')
+                              ? Image.network(_profilePhotoUrl!, fit: BoxFit.cover)
+                              : Image.file(
+                                  File(_profilePhotoUrl!),
+                                  fit: BoxFit.cover,
+                                ))
                           : Center(
                               child: Text(
                                 _initials,
@@ -396,7 +603,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     bottom: 2,
                     right: 2,
                     child: GestureDetector(
-                      onTap: _pickProfileImage, // 👈 changed function
+                      onTap: _openProfileImageActions,
                       child: Container(
                         width: 28,
                         height: 28,
@@ -735,6 +942,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Text(label),
           );
   }
+
+  Widget _imageActionTile({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color color = AppColors.text,
+  }) {
+    return ListTile(
+      onTap: onTap,
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, color: color),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
 }
 
 // ─── Dark Dialog Widget ──────────────────────────────────────────────────────
@@ -867,6 +1095,15 @@ class _SavedQuizzesPageState extends State<SavedQuizzesPage> {
                   quiz['useRandomSelection'] as bool? ?? false;
               final randomQuestionCount =
                   quiz['randomQuestionCount'] as int? ?? 10;
+              final customQuestionsRaw =
+                  quiz['customQuestions'] as List<dynamic>? ?? const [];
+              final customQuestions = customQuestionsRaw
+                  .map(
+                    (item) => Question.fromJson(
+                      Map<String, dynamic>.from(item as Map),
+                    ),
+                  )
+                  .toList();
 
               return Container(
                 padding: const EdgeInsets.symmetric(
@@ -941,6 +1178,9 @@ class _SavedQuizzesPageState extends State<SavedQuizzesPage> {
                               title,
                               useRandomSelection: useRandomSelection,
                               randomQuestionCount: randomQuestionCount,
+                              customQuestions: customQuestions.isEmpty
+                                  ? null
+                                  : customQuestions,
                             ),
                           ),
                         );

@@ -55,9 +55,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       await credential.user?.updateDisplayName(nameController.text.trim());
       await credential.user?.reload();
 
-      await UserCache.updateProfile(
+      await UserCache.initializeCurrentUserData(
         name: nameController.text.trim(),
         email: emailController.text.trim(),
+        photoUrl: credential.user?.photoURL ?? '',
       );
       await UserCache.setLoggedIn(true);
       success = true;
@@ -259,52 +260,52 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
 
                 /// OR SIGN UP WITH
-                Row(
-                  children: const [
-                    Expanded(child: Divider(color: Colors.white24)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "OR SIGN UP WITH",
-                        style: TextStyle(color: Colors.white54),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.white24)),
-                  ],
-                ),
+                // Row(
+                //   children: const [
+                //     Expanded(child: Divider(color: Colors.white24)),
+                //     Padding(
+                //       padding: EdgeInsets.symmetric(horizontal: 10),
+                //       child: Text(
+                //         "OR SIGN UP WITH",
+                //         style: TextStyle(color: Colors.white54),
+                //       ),
+                //     ),
+                //     Expanded(child: Divider(color: Colors.white24)),
+                //   ],
+                // ),
 
-                const SizedBox(height: 25),
+                // const SizedBox(height: 25),
 
                 /// Google & Apple Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: socialButton(
-                        icon: Icons.g_mobiledata,
-                        text: "Google",
-                        onTap: () {
-                          _toast('Google Sing Up Clicked');
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: socialButton(
+                //         icon: Icons.g_mobiledata,
+                //         text: "Google",
+                //         onTap: () {
+                //           _toast('Google Sing Up Clicked');
                           
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: socialButton(
-                        icon: Icons.apple,
-                        text: "Apple",
-                        onTap: () {
-                          _toast('Apple Sign Up Clicked');
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                //         },
+                //       ),
+                //     ),
+                //     const SizedBox(width: 15),
+                //     Expanded(
+                //       child: socialButton(
+                //         icon: Icons.apple,
+                //         text: "Apple",
+                //         onTap: () {
+                //           _toast('Apple Sign Up Clicked');
+                //         },
+                //       ),
+                //     ),
+                //   ],
+                // ),
 
-                const SizedBox(height: 15),
+                const SizedBox(height: 10),
 
                 /// Login
                 Row(

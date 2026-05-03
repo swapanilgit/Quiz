@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+import 'package:quiz/Screens/AiQuizGeneratorScreen.dart';
+import 'package:quiz/Screens/ProfileScreen.dart';
 import 'package:quiz/Screens/QuizScreen.dart';
 import 'package:quiz/Screens/buildCategoryCard.dart';
 
@@ -21,19 +22,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Map<String, dynamic>> allCategories = [
     {"title": "Science", "icon": Icons.science, "color": Colors.blue},
-    {"title": "Indian History","icon": Icons.history_edu,"color": Colors.orange,},
+    {
+      "title": "Indian History",
+      "icon": Icons.history_edu,
+      "color": Colors.orange,
+    },
     {"title": "Physics", "icon": Icons.science, "color": Colors.purple},
-    {"title": "Chemistry","icon": Icons.science_outlined,"color": Colors.purple,},
-    {"title": "General Knowledge", "icon": Icons.question_answer, "color": Colors.grey},
+    {
+      "title": "Chemistry",
+      "icon": Icons.science_outlined,
+      "color": Colors.purple,
+    },
+    {
+      "title": "General Knowledge",
+      "icon": Icons.question_answer,
+      "color": Colors.grey,
+    },
     {"title": "Programming", "icon": Icons.code, "color": Colors.purple},
     {"title": "Computer", "icon": Icons.memory, "color": Colors.purple},
     {"title": "Art & Drawing", "icon": Icons.palette, "color": Colors.red},
     {"title": "Sports", "icon": Icons.sports_esports, "color": Colors.green},
-    {"title": "English ","icon": Icons.book,"color":Colors.white}
+    {"title": "Geography", "icon": Icons.language, "color": Colors.green},
+    // {"title": "Indian History", "icon": Icons.history_edu, "color": Colors.orange},
+    {"title": "English ", "icon": Icons.book, "color": Colors.white},
   ];
 
   List<Map<String, dynamic>> filteredCategories = [];
-
 
   void searchCategory(String query) {
     final results = allCategories.where((category) {
@@ -74,13 +88,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 8),
 
-              const Text(
-                "Explore Quizzes",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  const Text(
+                    "Explore Quizzes",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AiQuizGeneratorScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.auto_awesome,
+                      color: AppColors.indigoLight,
+                      size: 30,
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 20),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quiz/Screens/Forgot.dart';
 import 'package:quiz/Screens/ProfileScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
@@ -53,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ? user.displayName!.trim()
               : email.split('@').first,
           email: user.email ?? email,
+          photoUrl: user.photoURL ?? '',
         );
         await UserCache.setLoggedIn(true);
         success = true;
@@ -85,6 +87,73 @@ class _LoginScreenState extends State<LoginScreen> {
       MaterialPageRoute(builder: (_) => const MainScreen()),
       (route) => false,
     );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize();
+      await googleSignIn.disconnect();
+
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      if (googleAuth.idToken == null || googleAuth.idToken!.isEmpty) {
+        throw FirebaseAuthException(
+          code: 'google-id-token-missing',
+          message: 'Google sign in did not return an ID token.',
+        );
+      }
+
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      final user = userCredential.user;
+      if (user != null) {
+        await UserCache.updateProfile(
+          name: (user.displayName?.trim().isNotEmpty ?? false)
+              ? user.displayName!.trim()
+              : 'Google User',
+          email: user.email ?? '',
+          photoUrl: user.photoURL ?? '',
+        );
+        await UserCache.setLoggedIn(true);
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+      _toast(e.message ?? 'Google sign in failed');
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+      _toast('Google sign in failed');
+    }
   }
 
   @override
@@ -242,9 +311,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: (() => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const Forgot()),
-                          )),
+                        context,
+                        MaterialPageRoute(builder: (context) => const Forgot()),
+                      )),
                       child: const Text(
                         "Forgot Password?",
                         style: TextStyle(color: Colors.blue),
@@ -310,16 +379,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       socialButton(
                         text: "Google",
                         icon: Icons.g_mobiledata,
-                        onPressed: () {
-                          // Google login logic
-                        },
+                        onPressed: _isLoading ? null : _signInWithGoogle,
                       ),
                       const SizedBox(width: 16),
                       socialButton(
-                        text: "Facebook",
-                        icon: Icons.facebook,
+                        text: "Apple",
+                        icon: Icons.apple,
                         onPressed: () {
-                          // Facebook login logic
+                          // Apple login logic
                         },
                       ),
                     ],
@@ -344,7 +411,9 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CreateAccountScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => CreateAccountScreen(),
+                  ),
                 );
               },
               child: const Text(
@@ -361,7 +430,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget socialButton({
     required String text,
     required IconData icon,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
   }) {
     return Expanded(
       child: ElevatedButton.icon(
@@ -386,7 +455,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-  
+
   void _toast(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

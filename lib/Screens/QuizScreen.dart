@@ -18,18 +18,40 @@ class Question {
     required this.options,
     required this.correctIndex,
   });
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'question': question,
+    'options': options,
+    'correctIndex': correctIndex,
+  };
+
+  factory Question.fromJson(Map<String, dynamic> json) => Question(
+    title: json['title'] as String? ?? '',
+    question: json['question'] as String? ?? '',
+    options: List<String>.from(json['options'] as List? ?? const []),
+    correctIndex: json['correctIndex'] as int? ?? 0,
+  );
 }
 
 class QuizScreen extends StatefulWidget {
   final String title;
   final bool useRandomSelection;
   final int randomQuestionCount;
+  final List<Question>? customQuestions;
+  final int questionDurationSeconds;
+  final String? roomId;
+  final String? roomCode;
 
   const QuizScreen(
     this.title, {
     super.key,
     this.useRandomSelection = false,
     this.randomQuestionCount = 10,
+    this.customQuestions,
+    this.questionDurationSeconds = 20,
+    this.roomId,
+    this.roomCode,
   });
 
   @override
@@ -37,16 +59,20 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+  static const int _categoryQuestionCount = 10;
+
   int currentIndex = 0;
   int selectedIndex = -1;
   int score = 0;
   int seconds = 15;
   Timer? timer;
   late List<Question> questions;
+  bool _isLoadingQuestions = true;
   bool isTimeUp = false;
   bool _isSaved = false;
   bool _isShowingResult = false;
   bool _isQuizSaved = false;
+  bool _isSubmittingAnswer = false;
 
   List<AnsweredQuestion> answered = [];
 
@@ -836,23 +862,8 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-
-    if (widget.useRandomSelection) {
-      final random = Random();
-      final mixedQuestions =
-          allQuestions.values.expand((items) => items).toList()
-            ..shuffle(random);
-      final count = mixedQuestions.length < widget.randomQuestionCount
-          ? mixedQuestions.length
-          : widget.randomQuestionCount;
-      questions = mixedQuestions.take(count).toList();
-    } else {
-      questions = allQuestions[widget.title] ?? [];
-    }
-
-    if (questions.isNotEmpty) {
-      restartTimer();
-    }
+    questions = [];
+    _initializeQuestions();
   }
 
   @override
@@ -862,6 +873,8 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void autoNextQuestion() {
+    if (_isShowingResult || _isSubmittingAnswer) return;
+    _isSubmittingAnswer = true;
     recordAnswer();
 
     // DO NOT increase score if nothing selected
@@ -874,6 +887,7 @@ class _QuizScreenState extends State<QuizScreen> {
         currentIndex++;
         selectedIndex = -1;
       });
+      _isSubmittingAnswer = false;
       restartTimer();
     } else {
       timer?.cancel();
@@ -881,10 +895,78 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
+  Future<void> _initializeQuestions() async {
+    List<Question> resolvedQuestions;
+
+    if (widget.customQuestions != null && widget.customQuestions!.isNotEmpty) {
+      resolvedQuestions = List<Question>.from(widget.customQuestions!);
+    } else if (widget.useRandomSelection) {
+      final random = Random();
+      final mixedQuestions =
+          allQuestions.values.expand((items) => items).toList()
+            ..shuffle(random);
+      final count = mixedQuestions.length < widget.randomQuestionCount
+          ? mixedQuestions.length
+          : widget.randomQuestionCount;
+      resolvedQuestions = mixedQuestions.take(count).toList();
+    } else {
+      resolvedQuestions = await _buildCategoryQuestions(widget.title);
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      questions = resolvedQuestions;
+      _isLoadingQuestions = false;
+    });
+
+    if (questions.isNotEmpty) {
+      restartTimer();
+    }
+  }
+
+  Future<List<Question>> _buildCategoryQuestions(String category) async {
+    final pool = List<Question>.from(allQuestions[category] ?? const []);
+    if (pool.isEmpty) return [];
+
+    final random = Random();
+    pool.shuffle(random);
+
+    final targetCount = pool.length < _categoryQuestionCount
+        ? pool.length
+        : _categoryQuestionCount;
+
+    var seenKeys = await UserCache.loadSeenCategoryQuestionKeys(category);
+    List<Question> availableQuestions = pool
+        .where((question) => !seenKeys.contains(_questionKey(question)))
+        .toList();
+
+    if (availableQuestions.length < targetCount) {
+      await UserCache.clearSeenCategoryQuestionKeys(category);
+      seenKeys = <String>{};
+      availableQuestions = List<Question>.from(pool)..shuffle(random);
+    }
+
+    final selectedQuestions = availableQuestions.take(targetCount).toList();
+    final updatedSeenKeys = <String>{...seenKeys};
+    for (final question in selectedQuestions) {
+      updatedSeenKeys.add(_questionKey(question));
+    }
+    await UserCache.saveSeenCategoryQuestionKeys(
+      category: category,
+      questionKeys: updatedSeenKeys,
+    );
+
+    return selectedQuestions;
+  }
+
+  String _questionKey(Question question) =>
+      '${question.title}::${question.question.trim()}';
+
   void restartTimer() {
     timer?.cancel();
     isTimeUp = false;
-    seconds = 20;
+    seconds = widget.questionDurationSeconds;
     _isShowingResult = false;
 
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -908,38 +990,49 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-  void showResult() async {
+  Future<void> showResult() async {
     if (_isShowingResult) return;
     _isShowingResult = true;
+    _isSubmittingAnswer = true;
     timer?.cancel();
 
     if (!_isSaved) {
-      await UserCache.recordAttempt(
-        category: widget.title,
-        score: score,
-        total: questions.length,
-      );
-      await UserCache.saveQuizAttempt(
-        attempt: {
-          'id': DateTime.now().millisecondsSinceEpoch.toString(),
-          'subject': widget.title,
-          'date': DateTime.now().toIso8601String(),
-          'totalQuestions': questions.length,
-          'correctAnswers': score,
-          'questions': answered
-              .map(
-                (q) => {
-                  'questionNo': answered.indexOf(q) + 1,
-                  'question': q.question,
-                  'correctAnswer': q.correctAnswer,
-                  'selectedAnswer': q.userAnswer,
-                  'isCorrect': q.userAnswer == q.correctAnswer,
-                },
-              )
-              .toList(),
-        },
-      );
       _isSaved = true;
+
+      final finalScore = score;
+      final finalAnswered = List<AnsweredQuestion>.from(answered);
+      final attempt = {
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'subject': widget.title,
+        'date': DateTime.now().toIso8601String(),
+        'totalQuestions': questions.length,
+        'correctAnswers': finalScore,
+        'questions': finalAnswered.asMap().entries.map((entry) {
+          final q = entry.value;
+          return {
+            'questionNo': entry.key + 1,
+            'question': q.question,
+            'correctAnswer': q.correctAnswer,
+            'selectedAnswer': q.userAnswer,
+            'isCorrect': q.userAnswer == q.correctAnswer,
+          };
+        }).toList(),
+      };
+
+      Future.wait([
+        UserCache.recordAttempt(
+          category: widget.title,
+          score: finalScore,
+          total: questions.length,
+        ),
+        UserCache.saveQuizAttempt(attempt: attempt),
+        if (widget.roomId?.trim().isNotEmpty ?? false)
+          UserCache.saveRoomParticipantAttempt(
+            roomId: widget.roomId!.trim(),
+            score: finalScore,
+            totalQuestions: questions.length,
+          ),
+      ]).catchError((_) {});
     }
 
     showDialog(
@@ -980,6 +1073,7 @@ class _QuizScreenState extends State<QuizScreen> {
       title: widget.title,
       useRandomSelection: widget.useRandomSelection,
       randomQuestionCount: widget.randomQuestionCount,
+      customQuestions: widget.customQuestions?.map((q) => q.toJson()).toList(),
     );
 
     if (!mounted) return;
@@ -990,7 +1084,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void submitAnswer() {
-    if (isTimeUp) return; // Prevent submit after time up
+    if (isTimeUp || _isSubmittingAnswer || _isShowingResult) return;
 
     if (selectedIndex == -1) {
       ScaffoldMessenger.of(
@@ -999,6 +1093,7 @@ class _QuizScreenState extends State<QuizScreen> {
       return;
     }
 
+    _isSubmittingAnswer = true;
     timer?.cancel();
 
     if (selectedIndex == questions[currentIndex].correctIndex) {
@@ -1012,6 +1107,7 @@ class _QuizScreenState extends State<QuizScreen> {
         currentIndex++;
         selectedIndex = -1;
       });
+      _isSubmittingAnswer = false;
       restartTimer();
     } else {
       showResult();
@@ -1020,6 +1116,13 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingQuestions) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF0F172A),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     double progressValue = questions.isEmpty
         ? 0
         : (currentIndex + 1) / questions.length;
@@ -1110,7 +1213,9 @@ class _QuizScreenState extends State<QuizScreen> {
                         height: 70,
                         width: 70,
                         child: CircularProgressIndicator(
-                          value: seconds / 15,
+                          value: widget.questionDurationSeconds <= 0
+                              ? 0
+                              : seconds / widget.questionDurationSeconds,
                           strokeWidth: 6,
                           backgroundColor: Colors.white12,
                           valueColor: const AlwaysStoppedAnimation(Colors.blue),
@@ -1184,7 +1289,9 @@ class _QuizScreenState extends State<QuizScreen> {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: submitAnswer,
+                  onPressed: _isSubmittingAnswer || _isShowingResult
+                      ? null
+                      : submitAnswer,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
