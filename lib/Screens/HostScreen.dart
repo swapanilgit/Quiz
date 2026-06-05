@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quiz/Screens/OnlineQuizMakerScreen.dart';
+import 'package:flutter/services.dart';
 import 'package:quiz/Screens/host/host_models.dart';
 import 'package:quiz/Screens/host/host_section_title.dart';
 import 'package:quiz/Screens/host/question_builder_card.dart';
@@ -15,6 +15,8 @@ class HostScreen extends StatefulWidget {
 }
 
 class _HostScreenState extends State<HostScreen> {
+  static const MethodChannel _shareChannel = MethodChannel('quiz/share');
+
   final TextEditingController _quizTitleController = TextEditingController();
   final TextEditingController _subjectController = TextEditingController();
 
@@ -33,11 +35,31 @@ class _HostScreenState extends State<HostScreen> {
 
   void _showToast(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
+  }
+
+  String _roomShareText(String code) =>
+      'Join my quiz room in Brain Byte. Room code: $code';
+
+  Future<void> _copyRoomCode(String code) async {
+    await Clipboard.setData(ClipboardData(text: code));
+    if (!mounted) return;
+    _showToast('Room code copied');
+  }
+
+  Future<void> _shareRoomCode(String code) async {
+    final text = _roomShareText(code);
+    try {
+      await _shareChannel.invokeMethod<void>('shareText', {
+        'text': text,
+        'subject': 'Brain Byte Quiz Room',
+      });
+    } catch (_) {
+      await Clipboard.setData(ClipboardData(text: text));
+      if (!mounted) return;
+      _showToast('Sharing is unavailable, invite text copied');
+    }
   }
 
   Future<void> _publishRoom() async {
@@ -110,22 +132,36 @@ class _HostScreenState extends State<HostScreen> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 16,
+                  horizontal: 12,
+                  vertical: 10,
                 ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF111B28),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Text(
-                  code,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF2D8CFF),
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 6,
-                  ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        code,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFF2D8CFF),
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 6,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Copy room code',
+                      onPressed: () => _copyRoomCode(code),
+                      icon: const Icon(
+                        Icons.copy_rounded,
+                        color: Color(0xFF9EB0C6),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 12),
@@ -140,6 +176,11 @@ class _HostScreenState extends State<HostScreen> {
             ],
           ),
           actions: [
+            TextButton.icon(
+              onPressed: () => _shareRoomCode(code),
+              icon: const Icon(Icons.share_rounded),
+              label: const Text('Share'),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
@@ -156,10 +197,11 @@ class _HostScreenState extends State<HostScreen> {
       if (!mounted) return;
       _showToast(e.toString().replaceFirst('Exception: ', ''));
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _isPublishing = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isPublishing = false;
+        });
+      }
     }
   }
 
@@ -209,7 +251,10 @@ class _HostScreenState extends State<HostScreen> {
                     )
                   : const Text(
                       'Publish',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
             ),
           ),
@@ -281,10 +326,7 @@ class _HostScreenState extends State<HostScreen> {
                 },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  side: const BorderSide(
-                    color: Color(0xFF24354A),
-                    width: 1.2,
-                  ),
+                  side: const BorderSide(color: Color(0xFF24354A), width: 1.2),
                   minimumSize: const Size(double.infinity, 66),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),

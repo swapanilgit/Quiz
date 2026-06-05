@@ -252,8 +252,7 @@ class UserCache {
     final cachedProfile = await loadCachedProfile();
     final authUser = await loadAuthUser();
 
-    final participantId =
-        (firebaseUser?.uid.isNotEmpty ?? false)
+    final participantId = (firebaseUser?.uid.isNotEmpty ?? false)
         ? firebaseUser!.uid
         : (authUser?.email.trim().isNotEmpty ?? false)
         ? authUser!.email.trim().toLowerCase()
@@ -268,8 +267,7 @@ class UserCache {
         ? authUser!.name.trim()
         : 'Guest Player';
 
-    final participantEmail =
-        (firebaseUser?.email?.trim().isNotEmpty ?? false)
+    final participantEmail = (firebaseUser?.email?.trim().isNotEmpty ?? false)
         ? firebaseUser!.email!.trim()
         : (cachedProfile?.email.trim().isNotEmpty ?? false)
         ? cachedProfile!.email.trim()
@@ -539,7 +537,9 @@ class UserCache {
     await prefs.setString(savedQuizzesKey, jsonEncode(saved));
   }
 
-  static Future<Set<String>> loadSeenCategoryQuestionKeys(String category) async {
+  static Future<Set<String>> loadSeenCategoryQuestionKeys(
+    String category,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final scopedSeenKey = await _scopedKey(_Keys.seenCategoryQuestions);
     final raw = prefs.getString(scopedSeenKey);
@@ -634,7 +634,10 @@ class UserCache {
 
     for (int i = 0; i < 10; i++) {
       final code = _generateRoomCode();
-      final existing = await rooms.where('code', isEqualTo: code).limit(1).get();
+      final existing = await rooms
+          .where('code', isEqualTo: code)
+          .limit(1)
+          .get();
       if (existing.docs.isNotEmpty) continue;
 
       await rooms.add({
@@ -681,7 +684,9 @@ class UserCache {
       try {
         await doc.reference.set({'status': 'expired'}, SetOptions(merge: true));
       } catch (_) {}
-      throw Exception('This room code has expired. Ask the host for a new code.');
+      throw Exception(
+        'This room code has expired. Ask the host for a new code.',
+      );
     }
 
     if (room.status != 'active') {
@@ -705,14 +710,16 @@ class UserCache {
       }
 
       if (refreshedExpiry != null && DateTime.now().isAfter(refreshedExpiry)) {
-        transaction.set(
-          doc.reference,
-          {'status': 'expired'},
-          SetOptions(merge: true),
-        );
+        transaction.set(doc.reference, {
+          'status': 'expired',
+        }, SetOptions(merge: true));
         throw Exception(
           'This room code has expired. Ask the host for a new code.',
         );
+      }
+
+      if (participantSnapshot.exists) {
+        throw Exception('You have already joined this quiz room.');
       }
 
       transaction.set(participantRef, {
@@ -722,14 +729,10 @@ class UserCache {
         'joinedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
-      if (!participantSnapshot.exists) {
-        final currentCount = roomData?['participantCount'] as int? ?? 0;
-        transaction.set(
-          doc.reference,
-          {'participantCount': currentCount + 1},
-          SetOptions(merge: true),
-        );
-      }
+      final currentCount = roomData?['participantCount'] as int? ?? 0;
+      transaction.set(doc.reference, {
+        'participantCount': currentCount + 1,
+      }, SetOptions(merge: true));
     });
 
     return room;
@@ -947,7 +950,10 @@ class UserCache {
     );
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(await _scopedKey(_Keys.stats), jsonEncode(updated.toJson()));
+    await prefs.setString(
+      await _scopedKey(_Keys.stats),
+      jsonEncode(updated.toJson()),
+    );
     try {
       await _syncStatsToCloud(updated);
     } catch (e) {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import "package:flutter/material.dart";
+import 'package:flutter/services.dart';
 import 'package:quiz/Screens/AnsweredQuestion.dart';
 import 'package:quiz/Screens/ProfileScreen.dart';
 import 'package:quiz/Screens/UserCache.dart';
@@ -58,8 +59,9 @@ class QuizScreen extends StatefulWidget {
   State<QuizScreen> createState() => _QuizScreenState();
 }
 
-class _QuizScreenState extends State<QuizScreen> {
+class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
   static const int _categoryQuestionCount = 10;
+  static const MethodChannel _securityChannel = MethodChannel('quiz/security');
 
   int currentIndex = 0;
   int selectedIndex = -1;
@@ -73,6 +75,7 @@ class _QuizScreenState extends State<QuizScreen> {
   bool _isShowingResult = false;
   bool _isQuizSaved = false;
   bool _isSubmittingAnswer = false;
+  bool _hasAutoSubmittedForAppSwitch = false;
 
   List<AnsweredQuestion> answered = [];
 
@@ -862,14 +865,86 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _securityChannel.setMethodCallHandler(_handleSecurityMethodCall);
+    _setScreenshotBlocked(true);
     questions = [];
     _initializeQuestions();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _securityChannel.setMethodCallHandler(null);
+    _setScreenshotBlocked(false);
     timer?.cancel();
     super.dispose();
+  }
+
+  Future<void> _handleSecurityMethodCall(MethodCall call) async {
+    if (call.method != 'windowFocusChanged') return;
+    final args = call.arguments;
+    final hasFocus = args is Map ? args['hasFocus'] == true : true;
+    if (!hasFocus) {
+      _autoSubmitForAppSwitch();
+    }
+  }
+
+  Future<void> _setScreenshotBlocked(bool blocked) async {
+    try {
+      await _securityChannel.invokeMethod<void>('setScreenshotBlocked', {
+        'blocked': blocked,
+      });
+    } catch (_) {}
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      _autoSubmitForAppSwitch();
+    }
+  }
+
+  void _autoSubmitForAppSwitch() {
+    if (_hasAutoSubmittedForAppSwitch ||
+        _isLoadingQuestions ||
+        _isShowingResult ||
+        questions.isEmpty) {
+      return;
+    }
+
+    _hasAutoSubmittedForAppSwitch = true;
+    _isSubmittingAnswer = true;
+    timer?.cancel();
+
+    if (selectedIndex == questions[currentIndex].correctIndex) {
+      score++;
+    }
+
+    for (int i = currentIndex; i < questions.length; i++) {
+      final question = questions[i];
+      final userAnswer = i == currentIndex && selectedIndex != -1
+          ? question.options[selectedIndex]
+          : 'Not Answered';
+      answered.add(
+        AnsweredQuestion(
+          question: question.question,
+          correctAnswer: question.options[question.correctIndex],
+          userAnswer: userAnswer,
+        ),
+      );
+    }
+
+    if (mounted) {
+      setState(() {
+        isTimeUp = true;
+      });
+    }
+
+    showResult();
   }
 
   void autoNextQuestion() {
@@ -1019,20 +1094,26 @@ class _QuizScreenState extends State<QuizScreen> {
         }).toList(),
       };
 
-      Future.wait([
-        UserCache.recordAttempt(
-          category: widget.title,
-          score: finalScore,
-          total: questions.length,
-        ),
-        UserCache.saveQuizAttempt(attempt: attempt),
-        if (widget.roomId?.trim().isNotEmpty ?? false)
-          UserCache.saveRoomParticipantAttempt(
-            roomId: widget.roomId!.trim(),
-            score: finalScore,
-            totalQuestions: questions.length,
-          ),
-      ]).catchError((_) {});
+      unawaited(
+        (() async {
+          try {
+            await Future.wait([
+              UserCache.recordAttempt(
+                category: widget.title,
+                score: finalScore,
+                total: questions.length,
+              ),
+              UserCache.saveQuizAttempt(attempt: attempt),
+              if (widget.roomId?.trim().isNotEmpty ?? false)
+                UserCache.saveRoomParticipantAttempt(
+                  roomId: widget.roomId!.trim(),
+                  score: finalScore,
+                  totalQuestions: questions.length,
+                ),
+            ]);
+          } catch (_) {}
+        })(),
+      );
     }
 
     showDialog(
