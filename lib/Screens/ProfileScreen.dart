@@ -210,7 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _totalAttempts = stats.totalAttempts;
       _totalScore = stats.totalScore;
-
+    
       if (_totalScore > 100) {
         _rank = 1;
       } else if (_totalScore > 50) {
